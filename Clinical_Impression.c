@@ -32,11 +32,11 @@
  * If the program is running on Windows, then call the Windows Sleep function. Otherwise, call the Unix
  * sleep function
  */
-void sleepDelay () {
+void sleepDelay (int n) {
     #if defined(_WIN32)
-        Sleep(1000);
+        Sleep(1000*n);
     #else
-        sleep(1);
+        sleep(1*n);
     #endif
 }
 
@@ -53,7 +53,9 @@ void displayKey () {
     #endif
 }
 
-char userType(char choice) {
+char userType() {
+    char choice;
+
     do {
         printf("%s\n\n%s\n%s\n%s\n\n%s",
         "MENU #1 User Type",
@@ -64,16 +66,18 @@ char userType(char choice) {
         
         scanf(" %c", &choice);
 
-        if (!(choice == 'D' && choice == 'P' && choice == 'E')) {
+        if (!(choice == 'D' || choice == 'P' || choice == 'E')) {
             printf("\n\nInvalid choice. Please try again.\n\n");
-            sleepDelay();
+            sleepDelay(1);
         }
-    } while (!(choice == 'D' && choice == 'P' && choice == 'E'));
+    } while (!(choice == 'D' || choice == 'P' || choice == 'E'));
 
     return choice;
 }
 
-char doctorMenu(char choice) {
+char doctorMenu() {
+    char choice;
+
     do {
         printf("%s\n\n%s\n%s\n%s\n%s\n%s\n\n%s",
             "MENU #2 Doctor",
@@ -86,16 +90,18 @@ char doctorMenu(char choice) {
 
         scanf(" %c", &choice);
 
-        if (!(choice == 'C' && choice == 'U' && choice == 'D' && choice == 'M' && choice == 'E')) {
+        if (!(choice == 'C' || choice == 'U' || choice == 'D' || choice == 'M' || choice == 'E')) {
             printf("\n\nInvalid choice. Please try again.\n\n");
-            sleepDelay();
+            sleepDelay(1);
         }
-    } while (!(choice == 'C' && choice == 'U' && choice == 'D' && choice == 'M' && choice == 'E'));
+    } while (!(choice == 'C' || choice == 'U' || choice == 'D' || choice == 'M' || choice == 'E'));
     
     return choice;
 }
 
 int main() {
+
+    
     
 
     return 0;
