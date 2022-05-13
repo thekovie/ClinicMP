@@ -1,5 +1,5 @@
 /**
- * Description:       This is a console-based similar program that can generate a list of clinical impressions 
+ * Description:       This is a console-based program that can generate a list of clinical impressions 
  *                    along with other patient information in a summary in the form of history of present illness (HPI).
  * 
  * Programmed by:     John Kovie L. Niño
