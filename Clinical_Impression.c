@@ -5,7 +5,7 @@
  * Programmed by:     John Kovie L. Niño
  *                    Reign Elaiza D. Larraquel
  * 
- * Last modified:     May 30, 2022
+ * Last modified:     May 31, 2022
  * Version:           1.0-alpha
  * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
  *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
@@ -56,10 +56,10 @@ typedef struct patientInformation
 
 
 
-/**
- * If the program is running on Windows, then call the Windows Sleep function. Otherwise, call the Unix
- * sleep function
- */
+/*
+    If the program is running on Windows, then call the Windows Sleep function. Otherwise, call the Unix
+    sleep function
+*/
 void sleepDelay (int n) {
     #if defined(_WIN32)
         Sleep(1000*n);
@@ -68,10 +68,9 @@ void sleepDelay (int n) {
     #endif
 }
 
-
-/**
- * It waits for the user to press a key
- */
+/*
+    It waits for the user to press a key
+*/
 void displayKey () {
     printf("\n\nPress any key to continue...\n");
     #if defined(_WIN32) && !defined(UNIX) // If the system is Windows
@@ -81,6 +80,9 @@ void displayKey () {
     #endif
 }
 
+/*
+    Asks whether the user is a Doctor or a Patient
+*/
 char userType() {
     char choice;
 
@@ -103,6 +105,9 @@ char userType() {
     return choice;
 }
 
+/*
+    Displays the menu for the Doctor user
+*/
 char doctorMenu() {
     char choice;
 
@@ -127,9 +132,16 @@ char doctorMenu() {
     return choice;
 }
 
+/*
+    This function is used to write the symptoms and impressions to the file.
+
+    @param masterList   is the list of symptoms and impressions
+    @param fp_symptoms  is  the file that will contain the symptoms
+    @param N            is the number of symptoms
+*/
 void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
-    fp_symptoms = fopen("Symptoms.txt", "w");
     int counter;
+    fp_symptoms = fopen("Symptoms.txt", "w");
 
     fprintf(fp_symptoms, "%d\n", N); // write the number of symptoms to the file
     for (counter = 0; counter < N; counter++) {
@@ -141,20 +153,27 @@ void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
     fclose(fp_symptoms);
 }
 
+/*
+    Gathers information from the Doctor user, the name of each symptom and its corresponding question.
+
+    @param masterListSymptom    The list of symptoms and questions
+    @param fp_symptoms          The file pointer to the file containing the list of symptoms and questions
+    @param masterListImpression The list of impressions
+*/
 void inputSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, pairImpression* masterListImpression) {
     int counter;
     int noSymptoms;
 
-    //I1: Ask for the number of symptoms (let’s say this is N) 
+    //I1: Asks for the number of symptoms that will be entered 
     do {
         printf("How many symptoms do you want to consider? ");
         scanf("%d", &noSymptoms);
         
-        if (noSymptoms == 0 || noSymptoms > MAX_SYMPTOMS) {
-            printf("\n\nInvalid number of symptoms. Please try again.\n\n");
+        if (noSymptoms <= 0 || noSymptoms > MAX_SYMPTOMS) {
+            printf("\n\nInvalid number of symptoms. Please try again.\n\n"); // If the number of symptoms is invalid
             sleepDelay(1);
         }
-    } while (noSymptoms == 0 || noSymptoms > MAX_SYMPTOMS);
+    } while (noSymptoms <= 0 || noSymptoms > MAX_SYMPTOMS);
 
 
     //I2: Enter the name of each symptom and its corresponding question
@@ -162,18 +181,25 @@ void inputSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, pairImpres
 
         printf("Symptom # %d:\n", counter + 1); // Display the number of the symptom
         printf("What is the symptom?  ");
-        scanf(" %[^\n]", masterListSymptom[counter].symptom); //Place scanf here for symptom
+        scanf(" %[^\n]", masterListSymptom[counter].symptom); 
         
         printf("How do you want to ask the symptom?\n");
-        scanf(" %[^\n]", masterListSymptom[counter].question); //Place scanf here for symptom question
+        scanf(" %[^\n]", masterListSymptom[counter].question); 
         strcat(masterListSymptom[counter].question, " [Y/N]"); // add a [Y/N] to the question   
     }
 
-    masterListSymptom->overallSymptomsAmt = noSymptoms;
-    writeSymptoms(masterListSymptom, fp_symptoms, noSymptoms);
+    masterListSymptom->overallSymptomsAmt = noSymptoms; // set the number of symptoms in the master list
+    writeSymptoms(masterListSymptom, fp_symptoms, noSymptoms); // write the symptoms to the file
 }
 
+/*
+    This function is used to search the index of a symptom in the list of symptoms.
 
+    @param masterListSymptom    The list of symptoms and questions
+    @param masterListImpression The list of impressions
+    @param symptomIndex          The index of the symptom to be searched
+
+*/
 int findSymptomIndex(pairSymptom* masterListSymptom, pairImpression* masterListImpression, int symptomIndex) {
     int counter;
 
@@ -186,7 +212,13 @@ int findSymptomIndex(pairSymptom* masterListSymptom, pairImpression* masterListI
     return -1;
 }
 
+/*
+    This function is used to write the impressions and its corresponding symptoms to the file.
 
+    @param masterListImpression   is the list of impressions and symptoms
+    @param masterListSymptom      is the list of symptoms and questions
+    @param fp_impression          is the file that will contain the impressions and their corresponding symptoms
+*/
 void printImpressions(pairImpression* masterListImpression, pairSymptom* masterListSymptom, FILE *fp_impressions) {
     int counter, counter2;
     fp_impressions = fopen("Impressions.txt", "w");
@@ -194,7 +226,7 @@ void printImpressions(pairImpression* masterListImpression, pairSymptom* masterL
     fprintf(fp_impressions, "%d\n", masterListImpression->impressionsAmount); // write the number of impressions to the file
 
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
-        fprintf(fp_impressions, "%d\n", counter+1);
+        fprintf(fp_impressions, "%d\n", counter+1); // write the index of the impression
         fprintf(fp_impressions, "%s\n", masterListImpression[counter].impression);
 
         // print all index of symptoms under the impression
@@ -207,8 +239,15 @@ void printImpressions(pairImpression* masterListImpression, pairSymptom* masterL
     }
 
     fclose(fp_impressions);
-} 
+}
 
+/*
+    This function is used to gather information from the Doctor user, the name of each impression and the symptoms that are under it.
+
+    @param masterListImpression The list of impressions
+    @param masterListSymptom    The list of symptoms and questions
+    @param fp_impression        The file pointer to the file containing the list of impressions and its symptoms
+*/
 void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom, FILE *fp_impressions) {
     int noImpressions = 0;
     int presentSymptoms;
@@ -217,50 +256,50 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
     int symptomIndex;
 
 
-    //I3: Ask for the number of impressions
+    //I3: Ask for the number of impressions that will be entered
     do {
         printf("How many impressions do you want to enter? ");
         scanf("%d", &noImpressions);
         
-        if (noImpressions == 0 || noImpressions > MAX_IMPRESSION) {
-            printf("\n\nInvalid number of impressions. Please try again.\n\n");
+        if (noImpressions <= 0 || noImpressions > MAX_IMPRESSION) {
+            printf("\n\nInvalid number of impressions. Please try again.\n\n"); // If the number of impressions is invalid
             sleepDelay(1);
         }
-    } while (noImpressions == 0 || noImpressions > MAX_IMPRESSION);
+    } while (noImpressions <= 0 || noImpressions > MAX_IMPRESSION);
 
-    //I4: For I times, ask for each impression and list all the symptom names entered in I2
+    //I4: Enter each impression and list all the symptom names entered in I2
     for (counter1 = 0; counter1 < noImpressions; counter1++) {
-        printf("Impression # %d:\n", counter1 + 1);
+        printf("Impression # %d:\n", counter1 + 1); // Display the number of the impression
         printf("What is the illness?  ");
-        scanf(" %[^\n]", masterListImpression[counter1].impression); //Place scanf here for illness
+        scanf(" %[^\n]", masterListImpression[counter1].impression); 
     
     
-        printf("\nBelow is a list of symptoms.\n");
         //Print all listed in masterlist symptoms
+        printf("\nBelow is a list of symptoms.\n");
         for (counter2 = 0; counter2 < masterListSymptom->overallSymptomsAmt; counter2++) {
             printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
         }
         
-
+        // asks for the number of symptoms that are present in the case 
         printf("How many of the symptoms above are present in a %s case?  ", masterListImpression[counter1].impression);
-        scanf("%d", &presentSymptoms);
+        scanf("%d", &presentSymptoms); 
         
-        // assigns no of symptoms to the current impression
+        // assigns no. of symptoms to the current impression
         masterListImpression[counter1].symptomsAmountPerImpression = presentSymptoms;
 
+        // assigns the symptoms to the current impression
         printf("Enter the corresponding number of each symptom:\n");
 
         for(counter2 = 0; counter2 < presentSymptoms; counter2++){
-            scanf("%d", &symptomIndex); //Place scanf here for symptom
-            symptomIndex -= 1;
+            scanf("%d", &symptomIndex); // get the index of the symptom
+            symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
 
-            masterListImpression[counter1].symptoms[counter2] = masterListSymptom[symptomIndex];
-
+            masterListImpression[counter1].symptoms[counter2] = masterListSymptom[symptomIndex]; // assign the symptom to the current impression
         }
     }
 
-    masterListImpression->impressionsAmount = noImpressions;
-    printImpressions(masterListImpression, masterListSymptom, fp_impressions);
+    masterListImpression->impressionsAmount = noImpressions; // set the number of impressions in the master list
+    printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
 }
 
 void displaySymptoms(FILE *fp_symptoms){ //change function type to the correct type, this should return a string
