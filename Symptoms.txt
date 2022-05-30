@@ -1,0 +1,7 @@
+2
+1
+Flu
+Do you have colds? [Y/N]
+2
+Fever
+Do you have high temperature? [Y/N]
