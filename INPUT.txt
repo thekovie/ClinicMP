@@ -1,0 +1,22 @@
+d
+c
+4
+Body Pain
+Is your entire body in pain?
+Headache
+Do you have a headache?
+Body Rashes
+Does your entire body have rashes?
+High Fever
+Do you have a high temperature?
+2
+Flu
+3
+2
+3
+4
+Dengue
+2
+1
+4
+e
