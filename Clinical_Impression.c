@@ -41,8 +41,9 @@ typedef struct pairSymptom
 typedef struct pairImpression
 {
     pairSymptom symptoms[MAX_SYMPTOMS];
-    String50 impression;
-    int symptomsAmountPerImpression;
+    String50 impression; 
+    int symptomsAmountPerImpression; // The amount of symptoms per impression
+    int symptomsIndexPerImpression[MAX_SYMPTOMS]; // The index of the symptoms per impression
     int impressionsAmount;
 } pairImpression;
 
@@ -160,9 +161,12 @@ void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
     @param fp_symptoms          The file pointer to the file containing the list of symptoms and questions
     @param masterListImpression The list of impressions
 */
-void inputSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, pairImpression* masterListImpression) {
+void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
+    FILE *fp_symptoms;
     int counter;
     int noSymptoms;
+
+    fp_symptoms = fopen("Symptoms.txt", "w");
 
     //I1: Asks for the number of symptoms that will be entered 
     do {
@@ -192,25 +196,6 @@ void inputSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, pairImpres
     writeSymptoms(masterListSymptom, fp_symptoms, noSymptoms); // write the symptoms to the file
 }
 
-/*
-    This function is used to search the index of a symptom in the list of symptoms.
-
-    @param masterListSymptom    The list of symptoms and questions
-    @param masterListImpression The list of impressions
-    @param symptomIndex          The index of the symptom to be searched
-
-*/
-int findSymptomIndex(pairSymptom* masterListSymptom, pairImpression* masterListImpression, int symptomIndex) {
-    int counter;
-
-    for (counter = 0; counter < masterListImpression->symptomsAmountPerImpression; counter++) {
-        if (strcmp(masterListSymptom[symptomIndex].symptom, masterListImpression->symptoms[counter].symptom) == 0) {
-            return 1;
-        }
-    }
-
-    return -1;
-}
 
 /*
     This function is used to write the impressions and its corresponding symptoms to the file.
@@ -231,9 +216,7 @@ void printImpressions(pairImpression* masterListImpression, pairSymptom* masterL
 
         // print all index of symptoms under the impression
         for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) {
-            if (findSymptomIndex(masterListSymptom, masterListImpression, counter) != -1) {
-                fprintf(fp_impressions, "%d ", counter2+1); // index of the symptom per impression
-            }
+            fprintf(fp_impressions, "%d ", masterListImpression[counter].symptomsIndexPerImpression[counter2]+1);
         }
         fprintf(fp_impressions, "\n");
     }
@@ -248,12 +231,15 @@ void printImpressions(pairImpression* masterListImpression, pairSymptom* masterL
     @param masterListSymptom    The list of symptoms and questions
     @param fp_impression        The file pointer to the file containing the list of impressions and its symptoms
 */
-void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom, FILE *fp_impressions) {
+void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
     int noImpressions = 0;
     int presentSymptoms;
     int counter1;
     int counter2;
     int symptomIndex;
+    FILE *fp_impressions;
+
+    fp_impressions = fopen("Impressions.txt", "w");
 
 
     //I3: Ask for the number of impressions that will be entered
@@ -295,6 +281,7 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
             symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
 
             masterListImpression[counter1].symptoms[counter2] = masterListSymptom[symptomIndex]; // assign the symptom to the current impression
+            masterListImpression[counter1].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
         }
     }
 
@@ -302,55 +289,130 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
     printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
 }
 
-void displaySymptoms(FILE *fp_symptoms){ //change function type to the correct type, this should return a string
+void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptomm) { 
+    String50 impression;
+    int counter, counter2;
 
     printf("What is the impression?  ");
-    //Place scanf here for impression
+    scanf(" %[^\n]", impression);
 
-    //printf("\nSymptoms of %s are:\n", /*add string array*/);
+    for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
+        if (strcmp(impression, masterListImpression[counter].impression) == 0) {
+            printf("\nThe symptoms for %s are:\n", impression);
+            for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) {
+                printf(" %s\n", counter2 + 1, masterListImpression[counter].symptoms[counter2].symptom);
+            }
+        }
+    }
+    
 }
 
-void modifySymptoms(){
-    //displaySymptoms(); //this should return a string
+
+void extractList(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
+    FILE *fp_impressions;
+    FILE *fp_symptoms;
+
+    fp_impressions = fopen("Impressions.txt", "r");
+    fp_symptoms = fopen("Symptoms.txt", "r");
+
+    if (fp_impressions != NULL && fp_symptoms != NULL) {
+        readImpressions(masterListImpression, fp_impressions); // read the impressions from the file
+        readSymptoms(masterListSymptom, fp_symptoms); // read the symptoms from the file
+
+        printf("\nSymptoms and Impressions has been extracted from the files.\n");
+    }
+    else {
+        printf("\n\nError: File not found.\n\n");
+        sleepDelay(1);
+    }
+
+    fclose(fp_impressions);
+    fclose(fp_symptoms);
+}
+
+void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
     
+}
+
+void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
+
+}
+
+void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom){
+    displaySymptoms(masterListImpression, masterListSymptom); //this should return a string
+    
+    //printf("You can modify the symptoms of %s", );
     //this could also be connected with inputImpression
 }
 
-void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression, FILE *fp_symptoms, FILE *fp_impressions) {
+void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
     switch(choice) {
         case 'C':
         case 'c':
-            inputSymptoms(masterListSymptom, fp_symptoms, masterListImpression);
-            inputImpression(masterListImpression, masterListSymptom, fp_impressions);
+            inputSymptoms(masterListSymptom, masterListImpression);
+            inputImpression(masterListImpression, masterListSymptom);
             break;
         case 'D':
         case 'd':
-            displaySymptoms(fp_symptoms);
+            displaySymptoms(masterListImpression, masterListSymptom);
             break;
         case 'M':
         case 'm':
-            modifySymptoms();
+            modifySymptoms(masterListImpression, masterListSymptom);
             break;
         case 'U':
         case 'u':
-            // function to use existing list of symptoms and impressions
+            extractList(masterListImpression, masterListSymptom);
             break;
     }
+}
+
+void printPatientInfo(patientInformation *patient) {
+    FILE *fp_patient;
+    String50 filename;
+
+
+    // Set filename to patient's ID no.
+    sprintf(filename, "%d.txt", patient->patientno);
+
+    // Open file
+    fp_patient = fopen(filename, "w");
+
+
+    fprintf(fp_patient, "History of Patient Illness\n\n");
+    fprintf(fp_patient, "%s, is a %d-year old ", patient->name, patient->age);
+    if (patient->gender == 'M' || patient->gender == 'm')
+        fprintf(fp_patient, "male. He has ");
+    if (patient->gender == 'F' || patient->gender == 'f')
+        fprintf(fp_patient, "female. She has ");
+    // print symptoms and impressions.
+
+    fclose(fp_patient);
 }
 
 void getPatientInfo (patientInformation *patient)
 {
     printf("What is your name? ");
     scanf(" %[^\n]", patient->name);
-
+    
     printf("What is your patient number? ");
     scanf("%d", &patient->patientno);
 
     printf("Enter your age: ");
     scanf("%d", &patient->age);
+    do {
+        printf("Gender (M/F): ");
+        scanf(" %c", &patient->gender);
 
-    printf("Gender (M/F): ");
-    scanf("%c", &patient->gender);
+        if (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f'))
+            printf("Wrong input, try again.\n\n");
+    } while (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f'));
+    
+
+    // ask questions to patient
+
+    // write text file
+    printPatientInfo(patient);
 
 }
 
@@ -367,7 +429,6 @@ void getSymptoms (pairSymptom *masterListSymptom, FILE *fp_symptoms)
     {
         printf("%s", masterListSymptom[counter].question);
         scanf("%d", &answer);
-        
     }
 
 
@@ -379,11 +440,6 @@ int main() {
     pairSymptom masterListSymptom[MAX_SYMPTOMS];
     pairImpression masterListImpression[MAX_IMPRESSION];
     patientInformation patient;
-    
-    FILE *fp_symptoms;
-    FILE *fp_impressions;
-
-    
 
     char cMenuChoice = userType();
     
@@ -391,7 +447,7 @@ int main() {
         switch (cMenuChoice) {
             case 'D':
             case 'd':
-                doctorChoice(doctorMenu(), masterListSymptom, masterListImpression, fp_symptoms, fp_impressions);
+                doctorChoice(doctorMenu(), masterListSymptom, masterListImpression);
                 break;
             case 'P':
             case 'p':
