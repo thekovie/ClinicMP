@@ -5,7 +5,7 @@
  * Programmed by:     John Kovie L. Niño
  *                    Reign Elaiza D. Larraquel
  * 
- * Last modified:     May 31, 2022
+ * Last modified:     Jun 1, 2022
  * Version:           1.0-alpha
  * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
  *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
