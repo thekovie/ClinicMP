@@ -53,6 +53,8 @@ typedef struct patientInformation
     int patientno;
     int age;
     char gender;
+    int patientSympAmt;
+    pairSymptom patientSymptoms[MAX_SYMPTOMS];
 } patientInformation;
 
 
@@ -224,6 +226,36 @@ void printImpressions(pairImpression* masterListImpression, pairSymptom* masterL
     fclose(fp_impressions);
 }
 
+void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom, int impressionIndex){
+    int presentSymptoms;
+    int counter2;
+    int symptomIndex;
+
+    //Print all listed in masterlist symptoms
+        printf("\nBelow is a list of symptoms.\n");
+        for (counter2 = 0; counter2 < masterListSymptom->overallSymptomsAmt; counter2++) {
+            printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
+        }
+        
+        // asks for the number of symptoms that are present in the case 
+        printf("How many of the symptoms above are present in a %s case?  ", masterListImpression[impressionIndex].impression);
+        scanf("%d", &presentSymptoms); 
+        
+        // assigns no. of symptoms to the current impression
+        masterListImpression[impressionIndex].symptomsAmountPerImpression = presentSymptoms;
+
+        // assigns the symptoms to the current impression
+        printf("Enter the corresponding number of each symptom:\n");
+
+        for(counter2 = 0; counter2 < presentSymptoms; counter2++){
+            scanf("%d", &symptomIndex); // get the index of the symptom
+            symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
+
+            masterListImpression[impressionIndex].symptoms[counter2] = masterListSymptom[symptomIndex]; // assign the symptom to the current impression
+            masterListImpression[impressionIndex].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
+        }
+}
+
 /*
     This function is used to gather information from the Doctor user, the name of each impression and the symptoms that are under it.
 
@@ -259,30 +291,7 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
         printf("What is the illness?  ");
         scanf(" %[^\n]", masterListImpression[counter1].impression); 
     
-    
-        //Print all listed in masterlist symptoms
-        printf("\nBelow is a list of symptoms.\n");
-        for (counter2 = 0; counter2 < masterListSymptom->overallSymptomsAmt; counter2++) {
-            printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
-        }
-        
-        // asks for the number of symptoms that are present in the case 
-        printf("How many of the symptoms above are present in a %s case?  ", masterListImpression[counter1].impression);
-        scanf("%d", &presentSymptoms); 
-        
-        // assigns no. of symptoms to the current impression
-        masterListImpression[counter1].symptomsAmountPerImpression = presentSymptoms;
-
-        // assigns the symptoms to the current impression
-        printf("Enter the corresponding number of each symptom:\n");
-
-        for(counter2 = 0; counter2 < presentSymptoms; counter2++){
-            scanf("%d", &symptomIndex); // get the index of the symptom
-            symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
-
-            masterListImpression[counter1].symptoms[counter2] = masterListSymptom[symptomIndex]; // assign the symptom to the current impression
-            masterListImpression[counter1].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
-        }
+        assignSymptoms(masterListImpression, masterListSymptom, counter1);
     }
 
     masterListImpression->impressionsAmount = noImpressions; // set the number of impressions in the master list
@@ -304,7 +313,6 @@ void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterLi
             }
         }
     }
-    
 }
 
 
@@ -339,10 +347,12 @@ void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
 }
 
 void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom){
-    displaySymptoms(masterListImpression, masterListSymptom); //this should return a string
+    //int impressionIndex;
     
-    //printf("You can modify the symptoms of %s", );
-    //this could also be connected with inputImpression
+    // impressionIndex = displaySymptoms(masterListImpression, masterListSymptom); //this should return a string
+    
+    // printf("You can modify the symptoms of %s", masterListImpression[impressionIndex].impression);
+    // assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
 }
 
 void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
@@ -370,6 +380,7 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
 void printPatientInfo(patientInformation *patient) {
     FILE *fp_patient;
     String50 filename;
+    int counter;
 
 
     // Set filename to patient's ID no.
@@ -385,12 +396,45 @@ void printPatientInfo(patientInformation *patient) {
         fprintf(fp_patient, "male. He has ");
     if (patient->gender == 'F' || patient->gender == 'f')
         fprintf(fp_patient, "female. She has ");
-    // print symptoms and impressions.
+    for(counter = 0; counter < patient->patientSympAmt; counter++) {// print symptoms and impressions.
+        if(patient->patientSympAmt == 1)
+        {
+            fprintf(fp_patient, "%s.", patient->patientSymptoms[counter].symptom);
+
+        }
+        else if(patient->patientSympAmt > 1) {
+            if(counter < (patient->patientSympAmt - 2)){
+                fprintf(fp_patient, "%s, ", patient->patientSymptoms[counter].symptom);
+            }
+            else if(counter == (patient->patientSympAmt - 2)){
+                fprintf(fp_patient, "and %s.", patient->patientSymptoms[counter].symptom);
+            }
+        }
+    }
 
     fclose(fp_patient);
 }
 
-void getPatientInfo (patientInformation *patient)
+void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSymptom)
+{
+    char answer;
+    int counter;
+    int symptomIndex = 0;
+
+    for(counter = 0; counter < masterListSymptom->overallSymptomsAmt; counter++) {
+        printf("%s  ", masterListSymptom[counter].question);
+        scanf(" %c", &answer);
+
+        if(answer == 'Y' || answer == 'y') {
+            strcpy(patient->patientSymptoms[symptomIndex].symptom, masterListSymptom[counter].symptom);
+            symptomIndex++;
+        }
+    }
+
+    patient->patientSympAmt = symptomIndex + 1;
+}
+
+void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom)
 {
     printf("What is your name? ");
     scanf(" %[^\n]", patient->name);
@@ -410,30 +454,14 @@ void getPatientInfo (patientInformation *patient)
     
 
     // ask questions to patient
+    getPatientSymptoms(patient, masterListSymptom);
 
     // write text file
     printPatientInfo(patient);
 
 }
 
-void getSymptoms (pairSymptom *masterListSymptom, FILE *fp_symptoms)
-{
-    int question;
-    int answer;
-    int counter;
-    fp_symptoms = fopen("Symptoms.txt", "r");
 
-    fscanf(fp_symptoms, "%d", &question);
-
-    for(counter = 0; counter < question; counter++)
-    {
-        printf("%s", masterListSymptom[counter].question);
-        scanf("%d", &answer);
-    }
-
-
-    fclose(fp_symptoms);
-}
 
 
 int main() {
@@ -451,7 +479,7 @@ int main() {
                 break;
             case 'P':
             case 'p':
-                getPatientInfo(&patient);
+                getPatientInfo(&patient, masterListSymptom);
                 break;
         }
 
