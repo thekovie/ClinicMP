@@ -54,7 +54,9 @@ typedef struct patientInformation
     int age;
     char gender;
     int patientSympAmt;
+    int patientImpAmt;
     pairSymptom patientSymptoms[MAX_SYMPTOMS];
+    pairImpression patientImpressions[MAX_IMPRESSION];
 } patientInformation;
 
 
@@ -380,6 +382,7 @@ void printPatientInfo(patientInformation *patient) {
     FILE *fp_patient;
     String50 filename;
     int counter;
+    int counter2;
 
 
     // Set filename to patient's ID no.
@@ -390,7 +393,7 @@ void printPatientInfo(patientInformation *patient) {
 
 
     fprintf(fp_patient, "History of Patient Illness\n\n");
-    fprintf(fp_patient, "%s, is a %d-year old ", patient->name, patient->age);
+    fprintf(fp_patient, "%s, patient # %d is a %d-year old ", patient->name, patient->patientno, patient->age);
     if (patient->gender == 'M' || patient->gender == 'm')
         fprintf(fp_patient, "male. He has ");
     if (patient->gender == 'F' || patient->gender == 'f')
@@ -410,8 +413,49 @@ void printPatientInfo(patientInformation *patient) {
             }
         }
     }
+    fprintf(fp_patient, " Impressions are ");
+    for(counter2 = 0; counter2 < patient->patientImpAmt; counter2++) {// print symptoms and impressions.
+        if(patient->patientImpAmt == 1)
+        {
+            fprintf(fp_patient, "%s.", patient->patientImpressions[counter2].impression);
+
+        }
+        else if(patient->patientImpAmt > 1) {
+            if(counter2 < (patient->patientImpAmt - 1)){
+                fprintf(fp_patient, "%s, ", patient->patientImpressions[counter2].impression);
+            }
+            else if(counter2 == (patient->patientImpAmt - 1)){
+                fprintf(fp_patient, "and %s.", patient->patientImpressions[counter2].impression);
+            }
+        }
+    }
 
     fclose(fp_patient);
+}
+
+void getPatietImpression (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression) {
+    int counter1;
+    int counter2;
+    int counter3;
+    int matchSymptom = 0;
+    int impressionIndex = 0;
+
+    for(counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++){
+        for(counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++){
+            for(counter3 = 0; counter3 < patient->patientSympAmt; counter3++){
+                if(strcmp(masterListImpression[counter1].symptoms[counter2].symptom, patient->patientSymptoms[counter3].symptom) == 0){
+                    matchSymptom += 1;
+                }
+            }
+            if(matchSymptom == masterListImpression[counter1].symptomsAmountPerImpression){
+                strcpy(patient->patientImpressions[impressionIndex].impression, masterListImpression[counter1].impression);
+                impressionIndex += 1;
+            } 
+        }
+        matchSymptom = 0;
+    }
+
+    patient->patientImpAmt = impressionIndex;
 }
 
 void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSymptom)
@@ -426,14 +470,14 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
 
         if(answer == 'Y' || answer == 'y') {
             strcpy(patient->patientSymptoms[symptomIndex].symptom, masterListSymptom[counter].symptom);
-            symptomIndex++;
+            symptomIndex += 1;
         }
     }
 
     patient->patientSympAmt = symptomIndex + 1;
 }
 
-void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom)
+void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression)
 {
     printf("What is your name? ");
     scanf(" %[^\n]", patient->name);
@@ -454,6 +498,8 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
 
     // ask questions to patient
     getPatientSymptoms(patient, masterListSymptom);
+
+    getPatietImpression(patient, masterListSymptom, masterListImpression);
 
     // write text file
     printPatientInfo(patient);
@@ -478,7 +524,7 @@ int main() {
                 break;
             case 'P':
             case 'p':
-                getPatientInfo(&patient, masterListSymptom);
+                getPatientInfo(&patient, masterListSymptom, masterListImpression);
                 break;
         }
 
