@@ -265,10 +265,7 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 */
 void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
     int noImpressions = 0;
-    int presentSymptoms;
     int counter1;
-    int counter2;
-    int symptomIndex;
     FILE *fp_impressions;
 
     fp_impressions = fopen("Impressions.txt", "w");
@@ -309,10 +306,18 @@ void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterLi
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
             printf("\nThe symptoms for %s are:\n", impression);
             for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) {
-                printf(" %s\n", counter2 + 1, masterListImpression[counter].symptoms[counter2].symptom);
+                printf(" %s\n", masterListImpression[counter].symptoms[counter2].symptom);
             }
         }
     }
+}
+
+void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
+    
+}
+
+void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
+
 }
 
 
@@ -338,13 +343,7 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
     fclose(fp_symptoms);
 }
 
-void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
-    
-}
 
-void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
-
-}
 
 void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom){
     //int impressionIndex;
