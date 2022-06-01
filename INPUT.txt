@@ -12,9 +12,9 @@ Do you have a high temperature?
 2
 Flu
 3
-3
-2
 4
+2
+3
 Dengue
 2
 4
