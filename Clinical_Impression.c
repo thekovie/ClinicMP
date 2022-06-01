@@ -253,7 +253,6 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
             scanf("%d", &symptomIndex); // get the index of the symptom
             symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
 
-            masterListImpression[impressionIndex].symptoms[counter2] = masterListSymptom[symptomIndex]; // assign the symptom to the current impression
             masterListImpression[impressionIndex].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
         }
 }
@@ -297,28 +296,113 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
     printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
 }
 
-void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptomm) { 
+char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
+    int i;
+
+    for (i =  0; i < masterListSymptom->overallSymptomsAmt; i++) {
+        if (i == symptomIndex) {
+            return masterListSymptom[i].symptom;
+        }
+    }
+
+    return "";
+}
+
+
+void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
     String50 impression;
     int counter, counter2;
 
     printf("What is the impression?  ");
     scanf(" %[^\n]", impression);
 
+
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
             printf("\nThe symptoms for %s are:\n", impression);
             for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) {
-                printf(" %s\n", masterListImpression[counter].symptoms[counter2].symptom);
+                printf(" %s\n", outputSymptom(masterListImpression[counter].symptomsIndexPerImpression[counter2], masterListSymptom));
             }
         }
     }
 }
 
-void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
-    
+
+/**
+ * It reads the impressions file and stores the data in a struct
+ * 
+ * @param masterListImpression an array of structs that holds the impressions
+ * @param masterListSymptom a pointer to a struct that contains an array of structs.
+ * @param fp_impressions the file pointer to the file that contains the impressions
+ */
+void readImpressions(pairImpression* masterListImpression, pairSymptom* masterListSymptom, FILE *fp_impressions) {
+    int impressionCount, index;
+    String50 line;
+    fgets(line, 50, fp_impressions);
+    sscanf(line, "%d", &impressionCount);
+
+    masterListImpression->impressionsAmount = impressionCount;
+
+    int i;
+    for (i = 1; i <= impressionCount * 3; i++) {
+        fgets(line, MAX_STRING_SIZE, fp_impressions);
+        line[strlen(line) - 1] = '\0';
+        switch (i % 3) 
+        {
+            case 1: { //index
+                sscanf(line, "%d", &index);
+            }
+                break;
+            case 0: { //symptoms
+                String50 symptomNum = "";
+                int sympNum = 0; // temporary variable to hold the symptom number
+                int sympIndex = 0; //  index of symptomNum
+                int impIndex = 0; // the index of the impression in the master list
+                int j;
+                for (j = 0; j < strlen(line); j++) {
+                    if (line[j] != ' ') {
+                        symptomNum[sympIndex] = line[j];
+                        sympIndex++;
+                    }
+                    else if (line[j] == ' ' && sympIndex > 0) {
+                        sympNum = atoi(symptomNum); // convert the string to an integer
+                        masterListImpression[index - 1].symptomsIndexPerImpression[impIndex] = sympNum - 1; // subtract 1 to match the index of the symptom in the master list
+                        strcpy(symptomNum, ""); // reset the string
+                        impIndex++; // increment the index of the symptom in the impression
+                        sympIndex = 0; // reset the index of the symptomNum
+                    }
+                }
+                masterListImpression[index - 1].symptomsAmountPerImpression = impIndex;
+                
+            }
+                break;
+            case 2: { //diagnosis
+                
+                strcpy(masterListImpression[index - 1].impression, line);
+            }
+                break;
+        }
+    }
+
 }
 
+/**
+ * The function reads the number of symptoms from the file, then reads the symptom and the question for
+ * each symptom
+ * 
+ * @param masterListSymptom a pointer to a struct that contains the symptom and the question
+ * @param fp_symptoms the file pointer to the file that contains the symptoms
+ */
 void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
+    int counter, dumpIndex;
+
+    fscanf(fp_symptoms, "%d", &masterListSymptom->overallSymptomsAmt); // read the number of symptoms from the file
+
+    for (counter = 0; counter < masterListSymptom->overallSymptomsAmt; counter++) {
+        fscanf(fp_symptoms, "%d", &dumpIndex);
+        fscanf(fp_symptoms, " %[^\n]", masterListSymptom[counter].symptom); // read the symptom
+        fscanf(fp_symptoms, " %[^\n]", masterListSymptom[counter].question); // read the question
+    }
 
 }
 
@@ -331,18 +415,18 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
     fp_symptoms = fopen("Symptoms.txt", "r");
 
     if (fp_impressions != NULL && fp_symptoms != NULL) {
-        readImpressions(masterListImpression, fp_impressions); // read the impressions from the file
         readSymptoms(masterListSymptom, fp_symptoms); // read the symptoms from the file
+        readImpressions(masterListImpression, masterListSymptom, fp_impressions); // read the impressions from the file
 
         printf("\nSymptoms and Impressions has been extracted from the files.\n");
     }
     else {
-        printf("\n\nError: File not found.\n\n");
+        printf("\n\nError: File/s not found.\n\n");
         sleepDelay(1);
     }
 
-    fclose(fp_impressions);
     fclose(fp_symptoms);
+    fclose(fp_impressions);
 }
 
 
