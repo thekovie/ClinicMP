@@ -5,7 +5,7 @@
  * Programmed by:     John Kovie L. Niño
  *                    Reign Elaiza D. Larraquel
  * 
- * Last modified:     Jun 1, 2022
+ * Last modified:     Jun 2, 2022
  * Version:           1.0-alpha
  * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
  *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
@@ -325,6 +325,7 @@ void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterLi
             }
         }
     }
+
 }
 
 
@@ -431,13 +432,17 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
 
 
 
-void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom){
-    //int impressionIndex;
+void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
+    // int impressionIndex;
+    // FILE *fp_impressions;
     
     // impressionIndex = displaySymptoms(masterListImpression, masterListSymptom); //this should return a string
     
     // printf("You can modify the symptoms of %s", masterListImpression[impressionIndex].impression);
     // assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
+
+    // printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
+
 }
 
 void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
@@ -527,16 +532,19 @@ void getPatietImpression (patientInformation *patient, pairSymptom *masterListSy
     for(counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++){
         for(counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++){
             for(counter3 = 0; counter3 < patient->patientSympAmt; counter3++){
-                if(strcmp(masterListImpression[counter1].symptoms[counter2].symptom, patient->patientSymptoms[counter3].symptom) == 0){
+                if(strcmp(masterListImpression[counter1].symptoms[counter2].symptom, patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
                     matchSymptom += 1;
                 }
             }
+
             if(matchSymptom == masterListImpression[counter1].symptomsAmountPerImpression){
                 strcpy(patient->patientImpressions[impressionIndex].impression, masterListImpression[counter1].impression);
                 impressionIndex += 1;
-            } 
+            }         
+        
         }
         matchSymptom = 0;
+
     }
 
     patient->patientImpAmt = impressionIndex;
