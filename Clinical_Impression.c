@@ -391,7 +391,6 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
             }
         }
     }
-    displayKey();
 }
 
 
