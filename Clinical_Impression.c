@@ -518,10 +518,10 @@ void printPatientInfo(patientInformation *patient) {
 
         }
         else if(patient->patientSympAmt > 1) {
-            if(counter < (patient->patientSympAmt - 2)){
+            if(counter < (patient->patientSympAmt - 1)){
                 fprintf(fp_patient, "%s, ", patient->patientSymptoms[counter].symptom);
             }
-            else if(counter == (patient->patientSympAmt - 2)){
+            else if(counter == (patient->patientSympAmt - 1)){
                 fprintf(fp_patient, "and %s.", patient->patientSymptoms[counter].symptom);
             }
         }
@@ -605,7 +605,20 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
         } while (answer != 'Y' && answer != 'y' && answer != 'N' && answer != 'n');
     }
 
-    patient->patientSympAmt = symptomIndex + 1;
+    patient->patientSympAmt = symptomIndex;
+}
+
+void emptyHistory(patientInformation *patient) {
+    int symp, imp;
+    for(symp = 0; symp < patient->patientSympAmt; symp++) {
+        strcpy(patient->patientSymptoms[symp].symptom, "");
+    }
+    for(imp = 0; imp < patient->patientImpAmt; imp++) {
+        strcpy(patient->patientImpressions[imp].impression, "");
+    }
+
+    patient->patientSympAmt = 0;
+    patient->patientImpAmt = 0;
 }
 
 void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression)
@@ -626,6 +639,7 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
             printf("Wrong input, try again.\n\n");
     } while (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f'));
     
+    emptyHistory(patient);
 
     // ask questions to patient
     getPatientSymptoms(patient, masterListSymptom);
@@ -636,8 +650,6 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
     printPatientInfo(patient);
 
 }
-
-
 
 
 int main() {
