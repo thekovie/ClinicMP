@@ -40,7 +40,7 @@ typedef struct pairSymptom
 
 typedef struct pairImpression
 {
-    pairSymptom symptoms[MAX_SYMPTOMS];
+    //pairSymptom symptoms[MAX_SYMPTOMS];
     String50 impression; 
     int symptomsAmountPerImpression; // The amount of symptoms per impression
     int symptomsIndexPerImpression[MAX_SYMPTOMS]; // The index of the symptoms per impression
@@ -198,6 +198,7 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
 
     masterListSymptom->overallSymptomsAmt = noSymptoms; // set the number of symptoms in the master list
     writeSymptoms(masterListSymptom, fp_symptoms, noSymptoms); // write the symptoms to the file
+    
 }
 
 
@@ -296,6 +297,16 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
     printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
 }
 
+
+/**
+ * It takes in a symptom index and a pointer to a list of symptoms, and returns the symptom at the
+ * index.
+ * 
+ * @param symptomIndex The index of the symptom in the master list of symptoms.
+ * @param masterListSymptom This is a pointer to a struct that contains a list of symptoms.
+ * 
+ * @return The symptom that is associated with the symptomIndex.
+ */
 char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
     int i;
 
@@ -309,6 +320,14 @@ char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
 }
 
 
+/**
+ * It takes in a list of impressions and a list of symptoms, and then asks the user for an impression.
+ * It then searches the list of impressions for the user's input, and if it finds it, it prints out the
+ * symptoms associated with that impression.
+ * 
+ * @param masterListImpression This is a pointer to a struct that contains the impression and the symptoms associated with it.
+ * @param masterListSymptom a pointer to a struct that contains a list of symptoms
+ */
 void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
     String50 impression;
     int counter, counter2;
@@ -340,7 +359,7 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
     int impressionCount, index;
     String50 line;
     fgets(line, 50, fp_impressions);
-    sscanf(line, "%d", &impressionCount);
+    sscanf(line, "%d", &impressionCount); // get the number of impressions
 
     masterListImpression->impressionsAmount = impressionCount;
 
@@ -423,11 +442,11 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
     }
     else {
         printf("\n\nError: File/s not found.\n\n");
-        sleepDelay(1);
     }
 
     fclose(fp_symptoms);
     fclose(fp_impressions);
+    displayKey();
 }
 
 
@@ -446,10 +465,12 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 }
 
 void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
+    system("clear || cls");
     switch(choice) {
         case 'C':
         case 'c':
             inputSymptoms(masterListSymptom, masterListImpression);
+            system("clear || cls");
             inputImpression(masterListImpression, masterListSymptom);
             break;
         case 'D':
@@ -464,7 +485,10 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
         case 'u':
             extractList(masterListImpression, masterListSymptom);
             break;
+
+       
     }
+    system("clear || cls");
 }
 
 void printPatientInfo(patientInformation *patient) {
@@ -502,7 +526,11 @@ void printPatientInfo(patientInformation *patient) {
             }
         }
     }
-    fprintf(fp_patient, " Impressions are ");
+    if(patient->patientImpAmt == 0)
+            fprintf(fp_patient, " There are no impressions to be formed based on the symptoms present or observed.");
+    else
+        fprintf(fp_patient, " Impressions are ");
+
     for(counter2 = 0; counter2 < patient->patientImpAmt; counter2++) {// print symptoms and impressions.
         if(patient->patientImpAmt == 1)
         {
@@ -517,12 +545,16 @@ void printPatientInfo(patientInformation *patient) {
                 fprintf(fp_patient, "and %s.", patient->patientImpressions[counter2].impression);
             }
         }
+
+        
     }
+    printf("History of Patient Illness for Patient No. %d has been generated.\n\n", patient->patientno);
+    displayKey();
 
     fclose(fp_patient);
 }
 
-void getPatietImpression (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression) {
+void getPatientImpression (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression) {
     int counter1;
     int counter2;
     int counter3;
@@ -532,7 +564,8 @@ void getPatietImpression (patientInformation *patient, pairSymptom *masterListSy
     for(counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++){
         for(counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++){
             for(counter3 = 0; counter3 < patient->patientSympAmt; counter3++){
-                if(strcmp(masterListImpression[counter1].symptoms[counter2].symptom, patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
+                // old param: masterListImpression[counter1].symptoms[counter2].symptom
+                if(strcmp(outputSymptom(masterListImpression[counter1].symptomsIndexPerImpression[counter2], masterListSymptom), patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
                     matchSymptom += 1;
                 }
             }
@@ -557,13 +590,19 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
     int symptomIndex = 0;
 
     for(counter = 0; counter < masterListSymptom->overallSymptomsAmt; counter++) {
-        printf("%s  ", masterListSymptom[counter].question);
-        scanf(" %c", &answer);
+        do {
+            printf("%s  ", masterListSymptom[counter].question);
+            scanf(" %c", &answer);
 
-        if(answer == 'Y' || answer == 'y') {
-            strcpy(patient->patientSymptoms[symptomIndex].symptom, masterListSymptom[counter].symptom);
-            symptomIndex += 1;
-        }
+            if(answer == 'Y' || answer == 'y') {
+                strcpy(patient->patientSymptoms[symptomIndex].symptom, masterListSymptom[counter].symptom);
+                symptomIndex += 1;
+            }
+
+            if (answer != 'Y' && answer != 'y' && answer != 'N' && answer != 'n') {
+                printf("Invalid input. Please enter Y or N.\n\n");
+            }
+        } while (answer != 'Y' && answer != 'y' && answer != 'N' && answer != 'n');
     }
 
     patient->patientSympAmt = symptomIndex + 1;
@@ -591,7 +630,7 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
     // ask questions to patient
     getPatientSymptoms(patient, masterListSymptom);
 
-    getPatietImpression(patient, masterListSymptom, masterListImpression);
+    getPatientImpression(patient, masterListSymptom, masterListImpression);
 
     // write text file
     printPatientInfo(patient);
@@ -605,21 +644,27 @@ int main() {
     pairSymptom masterListSymptom[MAX_SYMPTOMS];
     pairImpression masterListImpression[MAX_IMPRESSION];
     patientInformation patient;
+    char docChoice;
 
     char cMenuChoice = userType();
     
     while (cMenuChoice != 'E' && cMenuChoice != 'e') {
+        system("clear || cls");
         switch (cMenuChoice) {
             case 'D':
             case 'd':
-                doctorChoice(doctorMenu(), masterListSymptom, masterListImpression);
+                do {
+                    system("clear || cls");
+                    docChoice = doctorMenu();
+                    doctorChoice(docChoice, masterListSymptom, masterListImpression);
+                } while(docChoice != 'E' && docChoice != 'e');
                 break;
             case 'P':
             case 'p':
                 getPatientInfo(&patient, masterListSymptom, masterListImpression);
                 break;
         }
-
+        system("clear || cls");
         cMenuChoice = userType();
     }
     
