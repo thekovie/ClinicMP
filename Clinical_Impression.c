@@ -10,7 +10,7 @@
  * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
  *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
  *                      for the help in implementing the pause code in some operating systems and other libraries for making
- *                      this project possible.         
+ *                      this project possible.        
  */
 
 #include <stdio.h>
@@ -31,6 +31,11 @@
 
 typedef char String50[MAX_STRING_SIZE];
 
+typedef struct filesExtracted {
+    int symptomBool;
+    int impressionBool;
+} filesExtracted;
+
 typedef struct pairSymptom
 {
     String50 question;
@@ -40,7 +45,6 @@ typedef struct pairSymptom
 
 typedef struct pairImpression
 {
-    //pairSymptom symptoms[MAX_SYMPTOMS];
     String50 impression; 
     int symptomsAmountPerImpression; // The amount of symptoms per impression
     int symptomsIndexPerImpression[MAX_SYMPTOMS]; // The index of the symptoms per impression
@@ -137,6 +141,8 @@ char doctorMenu() {
     return choice;
 }
 
+
+
 /*
     This function is used to write the symptoms and impressions to the file.
 
@@ -186,13 +192,26 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
 
     //I2: Enter the name of each symptom and its corresponding question
     for (counter = 0; counter < noSymptoms; counter++) {
+        do {
+            printf("Symptom # %d:\n", counter + 1); // Display the number of the symptom
+            printf("What is the symptom?  ");
+            scanf(" %[^\n]", masterListSymptom[counter].symptom);
+            if (strlen(masterListSymptom[counter].symptom) > MAX_STRING_SIZE) {
+                printf("\n\nInvalid symptom. Please try again.\n\n");
+                sleepDelay(1);
+            }
+        } while (strlen(masterListSymptom[counter].symptom) > MAX_STRING_SIZE);
 
-        printf("Symptom # %d:\n", counter + 1); // Display the number of the symptom
-        printf("What is the symptom?  ");
-        scanf(" %[^\n]", masterListSymptom[counter].symptom); 
         
-        printf("How do you want to ask the symptom?\n");
-        scanf(" %[^\n]", masterListSymptom[counter].question); 
+        do {
+            printf("How do you want to ask the symptom?\n");
+            scanf(" %[^\n]", masterListSymptom[counter].question);
+
+            if (strlen(masterListSymptom[counter].question) > MAX_STRING_SIZE) {
+                printf("\n\nInvalid question. Please try again.\n\n");
+                sleepDelay(1);
+            }
+        } while (strlen(masterListSymptom[counter].question) > MAX_STRING_SIZE);
         strcat(masterListSymptom[counter].question, " [Y/N]"); // add a [Y/N] to the question   
     }
 
@@ -240,10 +259,18 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
             printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
         }
         
-        // asks for the number of symptoms that are present in the case 
-        printf("How many of the symptoms above are present in a %s case?  ", masterListImpression[impressionIndex].impression);
-        scanf("%d", &presentSymptoms); 
-        
+        // asks for the number of symptoms that are present in the case
+        // while the number of symptoms is not valid
+        do {
+            printf("\nHow many symptoms are present in the case? ");
+            scanf("%d", &presentSymptoms);
+            
+            if (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS) {
+                printf("\n\nInvalid number of symptoms. Please try again.\n\n"); // If the number of symptoms is invalid
+                sleepDelay(1);
+            }
+        } while (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS);
+
         // assigns no. of symptoms to the current impression
         masterListImpression[impressionIndex].symptomsAmountPerImpression = presentSymptoms;
 
@@ -251,9 +278,17 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
         printf("Enter the corresponding number of each symptom:\n");
 
         for(counter2 = 0; counter2 < presentSymptoms; counter2++){
-            scanf("%d", &symptomIndex); // get the index of the symptom
+            // check if the symptom is valid
+            do {
+                printf("Symptom # %d: ", counter2 + 1);
+                scanf("%d", &symptomIndex);
+                if (symptomIndex <= 0 || symptomIndex > masterListSymptom->overallSymptomsAmt) {
+                    printf("\n\nInvalid symptom. Please try again.\n\n");
+                    sleepDelay(1);
+                }
+            } while (symptomIndex <= 0 || symptomIndex > masterListSymptom->overallSymptomsAmt);
+            
             symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
-
             masterListImpression[impressionIndex].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
         }
 }
@@ -286,9 +321,16 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
 
     //I4: Enter each impression and list all the symptom names entered in I2
     for (counter1 = 0; counter1 < noImpressions; counter1++) {
-        printf("Impression # %d:\n", counter1 + 1); // Display the number of the impression
-        printf("What is the illness?  ");
-        scanf(" %[^\n]", masterListImpression[counter1].impression); 
+        do {
+            printf("\nImpression # %d:\n", counter1 + 1); // Display the number of the impression
+            printf("What is the illness?  ");
+            scanf(" %[^\n]", masterListImpression[counter1].impression);
+
+            if (strlen(masterListImpression[counter1].impression) > MAX_STRING_SIZE) {
+                printf("\n\nInvalid impression. Please try again.\n\n");
+                sleepDelay(1);
+            }
+        } while (strlen(masterListImpression[counter1].impression) > MAX_STRING_SIZE);
     
         assignSymptoms(masterListImpression, masterListSymptom, counter1);
     }
@@ -320,6 +362,16 @@ char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
 }
 
 
+int isImpressionPresent(pairImpression* masterListImpression, char* impression){
+    int i;
+    for (i = 0; i < masterListImpression->impressionsAmount; i++) {
+        if (strcmp(masterListImpression[i].impression, impression) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /**
  * It takes in a list of impressions and a list of symptoms, and then asks the user for an impression.
  * It then searches the list of impressions for the user's input, and if it finds it, it prints out the
@@ -328,13 +380,8 @@ char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
  * @param masterListImpression This is a pointer to a struct that contains the impression and the symptoms associated with it.
  * @param masterListSymptom a pointer to a struct that contains a list of symptoms
  */
-void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
-    String50 impression;
+void displaySymptoms(String50 impression, pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
     int counter, counter2;
-
-    printf("What is the impression?  ");
-    scanf(" %[^\n]", impression);
-
 
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
@@ -344,7 +391,7 @@ void displaySymptoms(pairImpression* masterListImpression, pairSymptom* masterLi
             }
         }
     }
-
+    displayKey();
 }
 
 
@@ -407,6 +454,49 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
 }
 
 /**
+ * It checks if the files exist and if they are empty.
+ * 
+ * @return an integer value.
+ */
+int filesExists() {
+    FILE *fp_impressions;
+    FILE *fp_symptoms;
+
+    fp_impressions = fopen("impressions.txt", "r");
+    fp_symptoms = fopen("symptoms.txt", "r");
+
+    int size = 0;
+    int size2 = 0;
+    
+
+    fp_impressions = fopen("impressions.txt", "r");
+    fp_symptoms = fopen("symptoms.txt", "r");
+
+    if (fp_impressions == NULL || fp_symptoms == NULL) {
+        printf("\n\nThe file/s does not exist.\n\n");
+        return 0;
+    }
+
+
+    while (fgetc(fp_impressions) != EOF) {
+        size++;
+    }
+
+    while (fgetc(fp_symptoms) != EOF) {
+        size2++;
+    }
+
+    if (size == 0 || size2 == 0) {
+        printf("\nImpressions or Symptoms textfile is empty.\n\n");
+        return 0;
+    }
+
+    fclose(fp_impressions);
+    fclose(fp_symptoms);
+    return 1;
+}
+
+/**
  * The function reads the number of symptoms from the file, then reads the symptom and the question for
  * each symptom
  * 
@@ -426,22 +516,48 @@ void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
 
 }
 
+/**
+ * If the impressionBool and symptomBool are both 1, then return 1, else return 0.
+ * 
+ * @param isFilesExtracted a struct that contains two bools, one for each file.
+ * 
+ * @return an integer.
+ */
+int ifExtracted(filesExtracted* isFilesExtracted) {
+    if (isFilesExtracted->impressionBool == 1 && isFilesExtracted->symptomBool == 1) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 
-void extractList(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
+
+/**
+ * It reads the symptoms and impressions from the files and stores them in the linked lists
+ * 
+ * @param masterListImpression a pointer to a struct that contains a pointer to a struct that contains
+ * a pointer to a struct that contains a pointer to a struct that contains a pointer to a struct that
+ * contains a pointer to a struct that contains a pointer to a struct that contains a pointer to a
+ * struct that contains a pointer to a
+ * @param masterListSymptom a linked list of symptoms
+ * @param isFilesExtracted a struct that contains two bools, one for symptoms and one for impressions.
+ */
+void extractList(pairImpression* masterListImpression, pairSymptom* masterListSymptom, filesExtracted* isFilesExtracted) {
     FILE *fp_impressions;
     FILE *fp_symptoms;
 
     fp_impressions = fopen("Impressions.txt", "r");
     fp_symptoms = fopen("Symptoms.txt", "r");
 
-    if (fp_impressions != NULL && fp_symptoms != NULL) {
+    if (filesExists()) {
         readSymptoms(masterListSymptom, fp_symptoms); // read the symptoms from the file
         readImpressions(masterListImpression, masterListSymptom, fp_impressions); // read the impressions from the file
 
         printf("\nSymptoms and Impressions has been extracted from the files.\n");
-    }
-    else {
-        printf("\n\nError: File/s not found.\n\n");
+        isFilesExtracted->impressionBool = 1;
+        isFilesExtracted->symptomBool = 1;
+
     }
 
     fclose(fp_symptoms);
@@ -452,38 +568,103 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
 
 
 void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
-    // int impressionIndex;
-    // FILE *fp_impressions;
-    
-    // impressionIndex = displaySymptoms(masterListImpression, masterListSymptom); //this should return a string
-    
-    // printf("You can modify the symptoms of %s", masterListImpression[impressionIndex].impression);
-    // assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
+    int impressionIndex;
+    String50 impression;
+    FILE *fp_impressions;
+    int counter;
 
-    // printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
+    printf("\n\nList of Impressions:\n");
+    for (counter = 0; counter < masterListImpression->impressionsAmount; counter++)
+        printf("- %s\n",masterListImpression[counter].impression);
+    printf("\n");
+
+
+    do {
+        printf("What is the impression?  ");
+        scanf(" %[^\n]", impression);
+
+        if (!isImpressionPresent(masterListImpression, impression)) {
+            printf("\n\nImpression not found. Take note that this is case-sensitive.\nPlease try again.\n\n");
+            sleepDelay(1);
+        }
+    } while (!isImpressionPresent(masterListImpression, impression));
+
+    displaySymptoms(impression, masterListImpression, masterListSymptom);
+
+    printf("You can modify the symptoms of %s.\n", impression);
+
+    // get the index of the impression without using break command
+    for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
+        if (strcmp(impression, masterListImpression[counter].impression) == 0) {
+            impressionIndex = counter;
+        }
+    }
+
+    fp_impressions = fopen("Impressions.txt", "w");
+
+    assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
+    printImpressions(masterListImpression, masterListSymptom, fp_impressions);
+
+    fclose(fp_impressions);
+    displayKey();
 
 }
 
-void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
+void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression, filesExtracted* isFilesExtracted) {
+    String50 impression;
+    int counter;
+
     system("clear || cls");
+
     switch(choice) {
         case 'C':
         case 'c':
             inputSymptoms(masterListSymptom, masterListImpression);
+            isFilesExtracted->symptomBool = 1;
             system("clear || cls");
             inputImpression(masterListImpression, masterListSymptom);
+            isFilesExtracted->impressionBool = 1;
             break;
         case 'D':
         case 'd':
-            displaySymptoms(masterListImpression, masterListSymptom);
+            if (ifExtracted(isFilesExtracted)) {
+                printf("\n\nList of Impressions:\n");
+                for (counter = 0; counter < masterListImpression->impressionsAmount; counter++)
+                    printf("- %s\n",masterListImpression[counter].impression);
+                printf("\n");
+
+                do {
+                printf("What is the impression?  ");
+                scanf(" %[^\n]", impression);
+
+                    if (!isImpressionPresent(masterListImpression, impression)) {
+                        printf("\n\nImpression not found. Take note that this is case-sensitive.\nPlease try again.\n\n");
+                        sleepDelay(1);
+                    }
+                } while (!isImpressionPresent(masterListImpression, impression));
+
+                displaySymptoms(impression, masterListImpression, masterListSymptom);
+            }
+            else
+                printf("\n[ERROR!] You cannot enter this option yet. Load the database first.\n\n");
+            
+            displayKey();
+
             break;
+
         case 'M':
         case 'm':
-            modifySymptoms(masterListImpression, masterListSymptom);
+            if (ifExtracted(isFilesExtracted)) {
+                modifySymptoms(masterListImpression, masterListSymptom);
+            }
+            else {
+                printf("\n[ERROR!] You cannot enter this option yet. Load the database first.\n\n");
+                displayKey();
+            }
             break;
         case 'U':
         case 'u':
-            extractList(masterListImpression, masterListSymptom);
+            extractList(masterListImpression, masterListSymptom, isFilesExtracted);
             break;
 
        
@@ -526,7 +707,7 @@ void printPatientInfo(patientInformation *patient) {
             }
         }
     }
-    if(patient->patientImpAmt == 0)
+    if (patient->patientImpAmt == 0)
             fprintf(fp_patient, " There are no impressions to be formed based on the symptoms present or observed.");
     else
         fprintf(fp_patient, " Impressions are ");
@@ -563,8 +744,7 @@ void getPatientImpression (patientInformation *patient, pairSymptom *masterListS
 
     for(counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++){
         for(counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++){
-            for(counter3 = 0; counter3 < patient->patientSympAmt; counter3++){
-                // old param: masterListImpression[counter1].symptoms[counter2].symptom
+            for(counter3 = 0; counter3 < patient->patientSympAmt; counter3++) {
                 if(strcmp(outputSymptom(masterListImpression[counter1].symptomsIndexPerImpression[counter2], masterListSymptom), patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
                     matchSymptom += 1;
                 }
@@ -608,6 +788,12 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
     patient->patientSympAmt = symptomIndex;
 }
 
+/**
+ * It takes a pointer to a patientInformation struct, and then it loops through the patientSymptoms and
+ * patientImpressions arrays, and sets each element to an empty string
+ * 
+ * @param patient a pointer to a patientInformation struct
+ */
 void emptyHistory(patientInformation *patient) {
     int symp, imp;
     for(symp = 0; symp < patient->patientSympAmt; symp++) {
@@ -655,30 +841,36 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
 int main() {
     pairSymptom masterListSymptom[MAX_SYMPTOMS];
     pairImpression masterListImpression[MAX_IMPRESSION];
+    filesExtracted isFilesExtracted;
     patientInformation patient;
     char docChoice;
 
-    char cMenuChoice = userType();
+    char cMenuChoice;
     
-    while (cMenuChoice != 'E' && cMenuChoice != 'e') {
+    do {
         system("clear || cls");
+        cMenuChoice = userType();
         switch (cMenuChoice) {
             case 'D':
             case 'd':
                 do {
                     system("clear || cls");
                     docChoice = doctorMenu();
-                    doctorChoice(docChoice, masterListSymptom, masterListImpression);
-                } while(docChoice != 'E' && docChoice != 'e');
+                    doctorChoice(docChoice, masterListSymptom, masterListImpression, &isFilesExtracted);
+                } while(docChoice != 'E' && docChoice != 'e' &&  docChoice != 'U' && docChoice != 'u');
                 break;
             case 'P':
             case 'p':
-                getPatientInfo(&patient, masterListSymptom, masterListImpression);
+                if (ifExtracted(&isFilesExtracted)) {
+                    getPatientInfo(&patient, masterListSymptom, masterListImpression);
+                }
+                else {
+                    printf("\n[ERROR!] You cannot enter this option yet. Load the database first.\n\n");
+                    displayKey();
+                }
                 break;
         }
-        system("clear || cls");
-        cMenuChoice = userType();
-    }
+    } while (cMenuChoice != 'E' && cMenuChoice != 'e');
     
     
 
