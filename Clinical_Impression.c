@@ -5,8 +5,8 @@
  * Programmed by:     John Kovie L. Niño
  *                    Reign Elaiza D. Larraquel
  * 
- * Last modified:     Jun 2, 2022
- * Version:           1.0-alpha
+ * Last modified:     Jun 4, 2022
+ * Version:           1.0
  * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
  *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
  *                      for the help in implementing the pause code in some operating systems and other libraries for making
@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+
 #if defined(_WIN32) // If the system is Windows
     #include <conio.h> // For the pause function
     #include <windows.h> // For the sleep function
@@ -29,13 +29,25 @@
 #define MAX_SYMPTOMS 20
 #define MAX_IMPRESSION 20
 
-typedef char String50[MAX_STRING_SIZE];
+typedef char String50[MAX_STRING_SIZE]; // String of 50 characters
 
+/**
+ * filesExtracted is a struct that contains 2 integers.
+ * @property {int} symptomBool - 1 if 'Symptoms.txt' has been extracted, 0 if it doesn't
+ * @property {int} impressionBool - 1 if 'Impressions.txt' has been extracted, 0 if it doesn't
+ */
 typedef struct filesExtracted {
     int symptomBool;
     int impressionBool;
 } filesExtracted;
 
+/**
+ * PairSymptom is a struct that contains a String50 question, a String50 symptom, and an int
+ * overallSymptomsAmt.
+ * @property {String50} question - The question that the user will be asked.
+ * @property {String50} symptom - The symptom that the user is experiencing.
+ * @property {int} overallSymptomsAmt - The amount of symptoms that the user has.
+ */
 typedef struct pairSymptom
 {
     String50 question;
@@ -43,14 +55,35 @@ typedef struct pairSymptom
     int overallSymptomsAmt;
 } pairSymptom;
 
+/**
+ * PairImpression is a struct that contains a string, an integer, an array of integers, and another
+ * integer.
+ * @property {String50} impression - The name of the impression
+ * @property {int} symptomsAmountPerImpression - The amount of symptoms per impression
+ * @property {int} symptomsIndexPerImpression - The index of the symptoms per impression
+ * @property {int} impressionsAmount - The amount of impressions in the array.
+ */
 typedef struct pairImpression
 {
     String50 impression; 
-    int symptomsAmountPerImpression; // The amount of symptoms per impression
-    int symptomsIndexPerImpression[MAX_SYMPTOMS]; // The index of the symptoms per impression
+    int symptomsAmountPerImpression;
+    int symptomsIndexPerImpression[MAX_SYMPTOMS];
     int impressionsAmount;
 } pairImpression;
 
+/**
+ * PatientInformation is a struct that contains a String50, two ints, a char, two ints, an array of
+ * pairSymptom, and an array of pairImpression.
+ * @property {String50} name - The name of the patient
+ * @property {int} patientno - The patient number.
+ * @property {int} age - age of the patient
+ * @property {char} gender - M for male, F for female
+ * @property {int} patientSympAmt - The amount of symptoms the patient has.
+ * @property {int} patientImpAmt - The amount of impressions the patient has.
+ * @property {pairSymptom} patientSymptoms - This is an array of structs that contain a symptom and a
+ * value.
+ * @property {pairImpression} patientImpressions - This is an array of pairImpression.
+ */
 typedef struct patientInformation
 {
     String50 name;
@@ -64,11 +97,12 @@ typedef struct patientInformation
 } patientInformation;
 
 
-
-/*
-    If the program is running on Windows, then call the Windows Sleep function. Otherwise, call the Unix
-    sleep function
-*/
+/**
+ * The function `sleepDelay` is a cross-platform function that will delay the execution of the program
+ * for `n` seconds
+ * 
+ * @param n The number of seconds to sleep.
+ */
 void sleepDelay (int n) {
     #if defined(_WIN32)
         Sleep(1000*n);
@@ -77,9 +111,10 @@ void sleepDelay (int n) {
     #endif
 }
 
-/*
-    It waits for the user to press a key
-*/
+
+/**
+ * It waits for the user to press a key
+ */
 void displayKey () {
     printf("\n\nPress any key to continue...\n");
     #if defined(_WIN32) && !defined(UNIX) // If the system is Windows
@@ -89,9 +124,13 @@ void displayKey () {
     #endif
 }
 
-/*
-    Asks whether the user is a Doctor or a Patient
-*/
+
+/**
+ * It asks the user to enter a choice of either D, P, or E. If the user enters anything other than D,
+ * P, or E, the user is asked to try again.
+ * 
+ * @return The user's choice.
+ */
 char userType() {
     char choice;
 
@@ -114,9 +153,12 @@ char userType() {
     return choice;
 }
 
-/*
-    Displays the menu for the Doctor user
-*/
+
+/**
+ * It's a function that displays a menu for the doctor to use, and returns the doctor's choice.
+ * 
+ * @return The choice of the user.
+ */
 char doctorMenu() {
     char choice;
 
@@ -192,6 +234,7 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
 
     //I2: Enter the name of each symptom and its corresponding question
     for (counter = 0; counter < noSymptoms; counter++) {
+        printf("\n\n");
         do {
             printf("Symptom # %d:\n", counter + 1); // Display the number of the symptom
             printf("What is the symptom?  ");
@@ -212,7 +255,7 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
                 sleepDelay(1);
             }
         } while (strlen(masterListSymptom[counter].question) > MAX_STRING_SIZE);
-        strcat(masterListSymptom[counter].question, " [Y/N]"); // add a [Y/N] to the question   
+        strcat(masterListSymptom[counter].question, " [Y/N]"); // add a [Y/N] to the question
     }
 
     masterListSymptom->overallSymptomsAmt = noSymptoms; // set the number of symptoms in the master list
@@ -248,49 +291,57 @@ void printImpressions(pairImpression* masterListImpression, pairSymptom* masterL
     fclose(fp_impressions);
 }
 
+/**
+ * It asks the user for the number of symptoms present in the case, then asks the user to input the
+ * corresponding number of each symptom
+ * 
+ * @param masterListImpression is a pointer to a struct that contains the impression and the symptoms
+ * that are associated with it.
+ * @param masterListSymptom is a pointer to a struct that contains the list of symptoms
+ * @param impressionIndex the index of the current impression
+ */
 void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom, int impressionIndex){
     int presentSymptoms;
     int counter2;
     int symptomIndex;
 
-    //Print all listed in masterlist symptoms
-        printf("\nBelow is a list of symptoms.\n");
-        for (counter2 = 0; counter2 < masterListSymptom->overallSymptomsAmt; counter2++) {
-            printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
-        }
+    printf("\nBelow is a list of symptoms.\n");
+    for (counter2 = 0; counter2 < masterListSymptom->overallSymptomsAmt; counter2++) {
+        printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
+    }
+    
+    // asks for the number of symptoms that are present in the case
+    // while the number of symptoms is not valid
+    do {
+        printf("\nHow many symptoms are present in the case? ");
+        scanf("%d", &presentSymptoms);
         
-        // asks for the number of symptoms that are present in the case
-        // while the number of symptoms is not valid
+        if (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS) {
+            printf("\n\nInvalid number of symptoms. Please try again.\n\n"); // If the number of symptoms is invalid
+            sleepDelay(1);
+        }
+    } while (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS);
+
+    // assigns no. of symptoms to the current impression
+    masterListImpression[impressionIndex].symptomsAmountPerImpression = presentSymptoms;
+
+    // assigns the symptoms to the current impression
+    printf("Enter the corresponding number of each symptom:\n");
+
+    for(counter2 = 0; counter2 < presentSymptoms; counter2++){
+        // check if the symptom is valid
         do {
-            printf("\nHow many symptoms are present in the case? ");
-            scanf("%d", &presentSymptoms);
-            
-            if (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS) {
-                printf("\n\nInvalid number of symptoms. Please try again.\n\n"); // If the number of symptoms is invalid
+            printf("Symptom # %d: ", counter2 + 1);
+            scanf("%d", &symptomIndex);
+            if (symptomIndex <= 0 || symptomIndex > masterListSymptom->overallSymptomsAmt) {
+                printf("\n\nInvalid symptom. Please try again.\n\n");
                 sleepDelay(1);
             }
-        } while (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS);
-
-        // assigns no. of symptoms to the current impression
-        masterListImpression[impressionIndex].symptomsAmountPerImpression = presentSymptoms;
-
-        // assigns the symptoms to the current impression
-        printf("Enter the corresponding number of each symptom:\n");
-
-        for(counter2 = 0; counter2 < presentSymptoms; counter2++){
-            // check if the symptom is valid
-            do {
-                printf("Symptom # %d: ", counter2 + 1);
-                scanf("%d", &symptomIndex);
-                if (symptomIndex <= 0 || symptomIndex > masterListSymptom->overallSymptomsAmt) {
-                    printf("\n\nInvalid symptom. Please try again.\n\n");
-                    sleepDelay(1);
-                }
-            } while (symptomIndex <= 0 || symptomIndex > masterListSymptom->overallSymptomsAmt);
-            
-            symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
-            masterListImpression[impressionIndex].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
-        }
+        } while (symptomIndex <= 0 || symptomIndex > masterListSymptom->overallSymptomsAmt);
+        
+        symptomIndex -= 1; // decrement the index by 1 to match the index of the symptom in the master list
+        masterListImpression[impressionIndex].symptomsIndexPerImpression[counter2] = symptomIndex; // assign the index of the symptom to the current impression
+    }
 }
 
 /*
@@ -362,6 +413,14 @@ char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
 }
 
 
+/**
+ * It checks if a given impression is present in the master list of impressions
+ * 
+ * @param masterListImpression is a pointer to a struct that contains a char* and an int.
+ * @param impression the impression to be checked
+ * 
+ * @return an integer.
+ */
 int isImpressionPresent(pairImpression* masterListImpression, char* impression){
     int i;
     for (i = 0; i < masterListImpression->impressionsAmount; i++) {
@@ -413,8 +472,7 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
     for (i = 1; i <= impressionCount * 3; i++) {
         fgets(line, MAX_STRING_SIZE, fp_impressions);
         line[strlen(line) - 1] = '\0';
-        switch (i % 3) 
-        {
+        switch (i % 3) {
             case 1: { //index
                 sscanf(line, "%d", &index);
             }
@@ -452,10 +510,11 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
 
 }
 
+
 /**
  * It checks if the files exist and if they are empty.
  * 
- * @return an integer value.
+ * @return the value of the variable size.
  */
 int filesExists() {
     FILE *fp_impressions;
@@ -476,14 +535,12 @@ int filesExists() {
         return 0;
     }
 
-
-    while (fgetc(fp_impressions) != EOF) {
+    while (fgetc(fp_impressions) != EOF)
         size++;
-    }
 
-    while (fgetc(fp_symptoms) != EOF) {
+
+    while (fgetc(fp_symptoms) != EOF)
         size2++;
-    }
 
     if (size == 0 || size2 == 0) {
         printf("\nImpressions or Symptoms textfile is empty.\n\n");
@@ -532,13 +589,11 @@ int ifExtracted(filesExtracted* isFilesExtracted) {
 }
 
 
+
 /**
- * It reads the symptoms and impressions from the files and stores them in the linked lists
+ * It reads the symptoms and impressions from the files and stores them in the linked lists.
  * 
- * @param masterListImpression a pointer to a struct that contains a pointer to a struct that contains
- * a pointer to a struct that contains a pointer to a struct that contains a pointer to a struct that
- * contains a pointer to a struct that contains a pointer to a struct that contains a pointer to a
- * struct that contains a pointer to a
+ * @param masterListImpression a struct that contains the impressions
  * @param masterListSymptom a linked list of symptoms
  * @param isFilesExtracted a struct that contains two bools, one for symptoms and one for impressions.
  */
@@ -565,7 +620,13 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
 }
 
 
-
+/**
+ * It asks the user for an impression, then displays the symptoms of that impression, then asks the
+ * user to modify the symptoms of that impression.
+ * 
+ * @param masterListImpression a struct that contains the impression and the amount of symptoms it has.
+ * @param masterListSymptom a struct that contains the symptoms
+ */
 void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
     int impressionIndex;
     String50 impression;
@@ -588,11 +649,12 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
         }
     } while (!isImpressionPresent(masterListImpression, impression));
 
+    sleepDelay(1);
     displaySymptoms(impression, masterListImpression, masterListSymptom);
 
-    printf("You can modify the symptoms of %s.\n", impression);
+    sleepDelay(1);
+    printf("\nYou can modify the symptoms of %s.\n", impression);
 
-    // get the index of the impression without using break command
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
             impressionIndex = counter;
@@ -601,14 +663,30 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 
     fp_impressions = fopen("Impressions.txt", "w");
 
+    sleepDelay(1);
     assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
     printImpressions(masterListImpression, masterListSymptom, fp_impressions);
 
+    sleepDelay(1);
+    printf("\n\nSymptoms for %s have been modified.\n", impression);
+
+    sleepDelay(1);
     fclose(fp_impressions);
     displayKey();
 
 }
 
+/**
+ * It's a function that takes in a character, two structs, and a struct pointer. It then checks the
+ * character and does a switch case
+ * 
+ * @param choice the choice of the user
+ * @param masterListSymptom a pointer to a struct that contains the symptoms and the amount of
+ * symptoms.
+ * @param masterListImpression a struct that contains the impression and the amount of impressions.
+ * @param isFilesExtracted a struct that contains the boolean values of whether the files have been
+ * extracted or not.
+ */
 void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression, filesExtracted* isFilesExtracted) {
     String50 impression;
     int counter;
@@ -641,7 +719,8 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
                         sleepDelay(1);
                     }
                 } while (!isImpressionPresent(masterListImpression, impression));
-
+                
+                sleepDelay(1);
                 displaySymptoms(impression, masterListImpression, masterListSymptom);
             }
             else
@@ -671,6 +750,11 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
     system("clear || cls");
 }
 
+/**
+ * It prints the patient's information to a file.
+ * 
+ * @param patient a pointer to a patientInformation struct
+ */
 void printPatientInfo(patientInformation *patient) {
     FILE *fp_patient;
     String50 filename;
@@ -728,12 +812,23 @@ void printPatientInfo(patientInformation *patient) {
 
         
     }
-    printf("History of Patient Illness for Patient No. %d has been generated.\n\n", patient->patientno);
-    displayKey();
+    printf("\n\nGenerating HPI for Patient No. %d...\n", patient->patientno);
+    sleepDelay(2);
+    fclose(fp_patient);  
 
-    fclose(fp_patient);
+    printf("History of Patient Illness for Patient No. %d has been generated.\nKindly open %d.txt to check your HPI.\n\n", patient->patientno, patient->patientno);
+    displayKey();
 }
 
+/**
+ * It compares the symptoms of the patient to the symptoms of the master list of impressions. If the
+ * symptoms match, the impression is added to the patient's impression list
+ * 
+ * @param patient a struct that contains the patient's symptoms and impressions
+ * @param masterListSymptom a struct that contains the symptom and its index
+ * @param masterListImpression a struct that contains the impression and the symptoms that are
+ * associated with it.
+ */
 void getPatientImpression (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression) {
     int counter1;
     int counter2;
@@ -762,6 +857,13 @@ void getPatientImpression (patientInformation *patient, pairSymptom *masterListS
     patient->patientImpAmt = impressionIndex;
 }
 
+/**
+ * The function asks the user to input a Y or N for each symptom in the master list of symptoms. If the
+ * user inputs a Y, the symptom is added to the patient's list of symptoms
+ * 
+ * @param patient a struct that holds the patient's information
+ * @param masterListSymptom This is a pointer to a struct that contains a list of symptoms.
+ */
 void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSymptom)
 {
     char answer;
@@ -806,6 +908,14 @@ void emptyHistory(patientInformation *patient) {
     patient->patientImpAmt = 0;
 }
 
+/**
+ * It asks the user for their name, age, gender, and then asks them a series of questions about their
+ * symptoms and impressions
+ * 
+ * @param patient a struct that contains the patient's information
+ * @param masterListSymptom a linked list of symptoms
+ * @param masterListImpression a linked list of impressions
+ */
 void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression)
 {
     printf("What is your name? ");
