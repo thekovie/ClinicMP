@@ -1,7 +1,7 @@
 2
 1
-Dengue
-
+Flu
+4 2 3 
 2
-Sick
-1 2 
+Dengue
+4 1 

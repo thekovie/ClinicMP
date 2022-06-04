@@ -1,7 +1,13 @@
-2
+4
 1
-Flu
-Do you have colds? [Y/N]
+Body Pain
+Is your entire body in pain? [Y/N]
 2
-Fever
-Do you have high temperature? [Y/N]
+Headache
+Do you have a headache? [Y/N]
+3
+Body Rashes
+Does your entire body have rashes? [Y/N]
+4
+High Fever
+Do you have a high temperature? [Y/N]
