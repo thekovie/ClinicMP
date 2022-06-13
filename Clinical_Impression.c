@@ -468,7 +468,7 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
 
     masterListImpression->impressionsAmount = impressionCount;
 
-    int i;
+    int i, j, k;
     for (i = 1; i <= impressionCount * 3; i++) {
         fgets(line, MAX_STRING_SIZE, fp_impressions);
         line[strlen(line) - 1] = '\0';
@@ -482,16 +482,23 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
                 int sympNum = 0; // temporary variable to hold the symptom number
                 int sympIndex = 0; //  index of symptomNum
                 int impIndex = 0; // the index of the impression in the master list
-                int j;
+
                 for (j = 0; j < strlen(line); j++) {
                     if (line[j] != ' ') {
                         symptomNum[sympIndex] = line[j];
                         sympIndex++;
                     }
-                    else if (line[j] == ' ' && sympIndex > 0) {
+                    else if (line[j] == ' ' && sympIndex > 0 || j == strlen(line) - 1) {
                         sympNum = atoi(symptomNum); // convert the string to an integer
                         masterListImpression[index - 1].symptomsIndexPerImpression[impIndex] = sympNum - 1; // subtract 1 to match the index of the symptom in the master list
-                        strcpy(symptomNum, ""); // reset the string
+                        
+                        int length = strlen(symptomNum);
+
+                        // clear the symptomNum
+                        for (k = 0; k < length; k++) {
+                            symptomNum[k] = '\0';
+                        }
+                        //strcpy(symptomNum, " "); // reset the string
                         impIndex++; // increment the index of the symptom in the impression
                         sympIndex = 0; // reset the index of the symptomNum
                     }
