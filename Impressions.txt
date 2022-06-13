@@ -1,7 +1,34 @@
-2
+11
 1
-Flu
-4 2 3 
+Motion Sickness
+14 4 5 1 
 2
 Dengue
-4 1 
+1 8 2 12 4 5 13 
+3
+Common Cold
+6 9 3 10 2 15 
+4
+Influenza (flu)
+2 3 9 6 12 5 4 
+5
+Diarrhea
+18 11 1 2 19 
+6
+High Stomach Acid
+18 1 11 7 16 17 
+7
+Allergies
+10 6 8 1 7 11 3 
+8
+Measles
+2 3 6 10 9 20 8 
+9
+Malaria
+2 5 1 7 18 12 4 3 
+10
+Rabies
+2 5 1 14 
+11
+Tuberculosis
+3 4 17 2 16 
