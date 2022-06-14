@@ -312,8 +312,9 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     int symptomIndex;
 
     printf("\nBelow is a list of symptoms.\n");
+    printf(" NO.\tSYMPTOM NAME\n");
     for (counter2 = 0; counter2 < masterListSymptom->overallSymptomsAmt; counter2++) {
-        printf("%d. %s\n", counter2 + 1, masterListSymptom[counter2].symptom);
+        printf(" [%d]\t%s\n", counter2 + 1, masterListSymptom[counter2].symptom);
     }
     
     // asks for the number of symptoms that are present in the case
@@ -355,7 +356,6 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 
     @param masterListImpression The list of impressions
     @param masterListSymptom    The list of symptoms and questions
-    @param fp_impression        The file pointer to the file containing the list of impressions and its symptoms
 */
 void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
     int noImpressions = 0;
@@ -459,7 +459,7 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
 }
 
 
-/**sa
+/**
  * It reads the impressions file and stores the data in a struct
  * 
  * @param masterListImpression an array of structs that holds the impressions
@@ -525,7 +525,7 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
 /**
  * It checks if the files exist and if they are empty.
  * 
- * @return the value of the variable size.
+ * @return the value 1 or 2 depending on whether the files exist and are empty.
  */
 int filesExists() {
     FILE *fp_impressions;
@@ -647,7 +647,6 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++)
         printf("- %s\n",masterListImpression[counter].impression);
     printf("\n");
-
 
     do {
         printf("What is the impression?  ");
