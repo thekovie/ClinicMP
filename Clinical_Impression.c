@@ -1,16 +1,16 @@
 /**
- * Description:       This is a console-based program that can generate a list of clinical impressions 
- *                    along with other patient information in a summary in the form of history of present illness (HPI).
- * 
- * Programmed by:     John Kovie L. Niño
- *                    Reign Elaiza D. Larraquel
- * 
- * Last modified:     Jun 14, 2022
- * Version:           1.0
- * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
- *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
- *                      for the help in implementing the pause code in some operating systems and other libraries for making
- *                      this project possible.        
+    Description:       This is a console-based program that can generate a list of clinical impressions 
+                      along with other patient information in a summary in the form of history of present illness (HPI).
+    
+    Programmed by:     John Kovie L. Niño
+                       Reign Elaiza D. Larraquel
+    
+    Last modified:     Jun 14, 2022
+    Version:           1.0
+    Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+                        and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
+                        for the help in implementing the pause code in some operating systems and other libraries for making
+                        this project possible.        
  */
 
 #include <stdio.h>
@@ -31,22 +31,26 @@
 
 typedef char String50[MAX_STRING_SIZE]; // String of 50 characters
 
+
 /**
- * filesExtracted is a struct that contains 2 integers.
- * @property {int} symptomBool - 1 if 'Symptoms.txt' has been extracted, 0 if it doesn't
- * @property {int} impressionBool - 1 if 'Impressions.txt' has been extracted, 0 if it doesn't
+    filesExtracted is a struct that contains 2 integers.
+
+    @property {int} symptomBool     1 if 'Symptoms.txt' has been extracted, 0 if it doesn't.
+    @property {int} impressionBool  1 if 'Impressions.txt' has been extracted, 0 if it doesn't.
  */
 typedef struct filesExtracted {
     int symptomBool;
     int impressionBool;
 } filesExtracted;
 
+
 /**
- * PairSymptom is a struct that contains a String50 question, a String50 symptom, and an int
- * overallSymptomsAmt.
- * @property {String50} question - The question that the user will be asked.
- * @property {String50} symptom - The symptom that the user is experiencing.
- * @property {int} overallSymptomsAmt - The amount of symptoms that the user has.
+    PairSymptom is a struct that contains a String50 question, a String50 symptom, and an int
+    overallSymptomsAmt.
+
+    @property {String50} question   The question that the user will be asked.
+    @property {String50} symptom    The symptom that the user is experiencing.
+    @property {int} overallSymptomsAmt  The amount of symptoms that the user has.
  */
 typedef struct pairSymptom
 {
@@ -55,13 +59,15 @@ typedef struct pairSymptom
     int overallSymptomsAmt;
 } pairSymptom;
 
+
 /**
- * PairImpression is a struct that contains a string, an integer, an array of integers, and another
- * integer.
- * @property {String50} impression - The name of the impression
- * @property {int} symptomsAmountPerImpression - The amount of symptoms per impression
- * @property {int} symptomsIndexPerImpression - The index of the symptoms per impression
- * @property {int} impressionsAmount - The amount of impressions in the array.
+    PairImpression is a struct that contains a string, an integer, an array of integers, and another
+    integer.
+    
+    @property {String50} impression     The name of the impression.
+    @property {int} symptomsAmountPerImpression     The amount of symptoms per impression.
+    @property {int} symptomsIndexPerImpression      The index of the symptoms per impression.
+    @property {int} impressionsAmount   The amount of impressions in the array.
  */
 typedef struct pairImpression
 {
@@ -71,18 +77,20 @@ typedef struct pairImpression
     int impressionsAmount;
 } pairImpression;
 
+
 /**
- * PatientInformation is a struct that contains a String50, two ints, a char, two ints, an array of
- * pairSymptom, and an array of pairImpression.
- * @property {String50} name - The name of the patient
- * @property {int} patientno - The patient number.
- * @property {int} age - age of the patient
- * @property {char} gender - M for male, F for female
- * @property {int} patientSympAmt - The amount of symptoms the patient has.
- * @property {int} patientImpAmt - The amount of impressions the patient has.
- * @property {pairSymptom} patientSymptoms - This is an array of structs that contain a symptom and a
- * value.
- * @property {pairImpression} patientImpressions - This is an array of pairImpression.
+    PatientInformation is a struct that contains a String50, two ints, a char, two ints, an array of
+    pairSymptom, and an array of pairImpression.
+    
+    @property {String50} name   The name of the patient.
+    @property {int} patientno   The patient number.
+    @property {int} age     age of the patient.
+    @property {char} gender     M for male, F for female.
+    @property {int} patientSympAmt  The amount of symptoms the patient has.
+    @property {int} patientImpAmt   The amount of impressions the patient has.
+    @property {pairSymptom} patientSymptoms     This is an array of structs that contain a symptom and a
+                                                value.
+    @property {pairImpression} patientImpressions   This is an array of pairImpression.
  */
 typedef struct patientInformation
 {
@@ -98,10 +106,10 @@ typedef struct patientInformation
 
 
 /**
- * The function `sleepDelay` is a cross-platform function that will delay the execution of the program
- * for `n` seconds
- * 
- * @param n The number of seconds to sleep.
+    The function `sleepDelay` is a cross-platform function that will delay the execution of the program
+    for `n` seconds
+
+    @param n    The number of seconds to sleep.
  */
 void sleepDelay (int n) {
     #if defined(_WIN32)
@@ -113,7 +121,7 @@ void sleepDelay (int n) {
 
 
 /**
- * It waits for the user to press a key
+    It waits for the user to press a key.
  */
 void displayKey () {
     printf("\n\nPress any key to continue...\n");
@@ -126,10 +134,10 @@ void displayKey () {
 
 
 /**
- * It asks the user to enter a choice of either D, P, or E. If the user enters anything other than D,
- * P, or E, the user is asked to try again.
- * 
- * @return The user's choice.
+    It asks the user to enter a choice of either D, P, or E. If the user enters anything other than D,
+    P, or E, the user is asked to try again.
+  
+    @return The user's choice.
  */
 char userType() {
     char choice;
@@ -155,9 +163,9 @@ char userType() {
 
 
 /**
- * It's a function that displays a menu for the doctor to use, and returns the doctor's choice.
- * 
- * @return The choice of the user.
+    It's a function that displays a menu for the doctor to use, and returns the doctor's choice.
+
+    @return The choice of the user.
  */
 char doctorMenu() {
     char choice;
@@ -184,13 +192,12 @@ char doctorMenu() {
 }
 
 
-
-/*
+/**
     This function is used to write the symptoms and impressions to the file.
 
-    @param masterList   is the list of symptoms and impressions
-    @param fp_symptoms  is  the file that will contain the symptoms
-    @param N            is the number of symptoms
+    @param masterList   is the list of symptoms and impressions.
+    @param fp_symptoms  is  the file that will contain the symptoms.
+    @param N    is the number of symptoms.
 */
 void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
     int counter;
@@ -208,10 +215,10 @@ void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
 
 
 /**
- * It asks the user for the number of symptoms they want to consider, then asks for the name of each
- * symptom and its corresponding question
- * 
- * @param masterListSymptom a pointer to a struct that contains the symptom and the question
+    It asks the user for the number of symptoms they want to consider, then asks for the name of each
+    symptom and its corresponding question.
+
+    @param masterListSymptom    a pointer to a struct that contains the symptom and the question.
  */
 void inputSymptoms(pairSymptom* masterListSymptom) {
     FILE *fp_symptoms;
@@ -270,12 +277,12 @@ void inputSymptoms(pairSymptom* masterListSymptom) {
 }
 
 
-/*
+/**
     This function is used to write the impressions and its corresponding symptoms to the file.
 
-    @param masterListImpression   is the list of impressions and symptoms
-    @param masterListSymptom      is the list of symptoms and questions
-    @param fp_impression          is the file that will contain the impressions and their corresponding symptoms
+    @param masterListImpression   is the list of impressions and symptoms.
+    @param masterListSymptom    is the list of symptoms and questions.
+    @param fp_impression    is the file that will contain the impressions and their corresponding symptoms.
 */
 void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
     int counter, counter2;
@@ -297,14 +304,15 @@ void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions
     fclose(fp_impressions);
 }
 
+
 /**
- * It asks the user for the number of symptoms present in the case, then asks the user to input the
- * corresponding number of each symptom
- * 
- * @param masterListImpression is a pointer to a struct that contains the impression and the symptoms
- * that are associated with it.
- * @param masterListSymptom is a pointer to a struct that contains the list of symptoms
- * @param impressionIndex the index of the current impression
+    It asks the user for the number of symptoms present in the case, then asks the user to input the
+    corresponding number of each symptom
+
+    @param masterListImpression     is a pointer to a struct that contains the impression and the symptoms
+                                    that are associated with it.
+    @param masterListSymptom     is a pointer to a struct that contains the list of symptoms
+    @param impressionIndex   the index of the current impression
  */
 void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom, int impressionIndex){
     int presentSymptoms;
@@ -351,10 +359,12 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     }
 }
 
-/*
-    This function is used to gather information from the Doctor user, the name of each impression and the symptoms that are under it.
 
-    @param masterListImpression The list of impressions
+/**
+    This function is used to gather information from the Doctor user, the name of each impression and the 
+    symptoms that are under it.
+
+    @param masterListImpression     The list of impressions
     @param masterListSymptom    The list of symptoms and questions
 */
 void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
@@ -398,13 +408,13 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
 
 
 /**
- * It takes in a symptom index and a pointer to a list of symptoms, and returns the symptom at the
- * index.
- * 
- * @param symptomIndex The index of the symptom in the master list of symptoms.
- * @param masterListSymptom This is a pointer to a struct that contains a list of symptoms.
- * 
- * @return The symptom that is associated with the symptomIndex.
+    It takes in a symptom index and a pointer to a list of symptoms, and returns the symptom at the
+    index.
+
+    @param symptomIndex     The index of the symptom in the master list of symptoms.
+    @param masterListSymptom    This is a pointer to a struct that contains a list of symptoms.
+
+    @return The symptom that is associated with the symptomIndex.
  */
 char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
     int i;
@@ -420,12 +430,12 @@ char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
 
 
 /**
- * It checks if a given impression is present in the master list of impressions
- * 
- * @param masterListImpression is a pointer to a struct that contains a char* and an int.
- * @param impression the impression to be checked
- * 
- * @return an integer.
+    It checks if a given impression is present in the master list of impressions.
+
+    @param masterListImpression     is a pointer to a struct that contains a char* and an int.
+    @param impression   the impression to be checked.
+
+    @return an integer.
  */
 int isImpressionPresent(pairImpression* masterListImpression, char* impression){
     int i;
@@ -437,13 +447,15 @@ int isImpressionPresent(pairImpression* masterListImpression, char* impression){
     return 0;
 }
 
+
 /**
- * It takes in a list of impressions and a list of symptoms, and then asks the user for an impression.
- * It then searches the list of impressions for the user's input, and if it finds it, it prints out the
- * symptoms associated with that impression.
- * 
- * @param masterListImpression This is a pointer to a struct that contains the impression and the symptoms associated with it.
- * @param masterListSymptom a pointer to a struct that contains a list of symptoms
+    It takes in a list of impressions and a list of symptoms, and then asks the user for an impression.
+    It then searches the list of impressions for the user's input, and if it finds it, it prints out the
+    symptoms associated with that impression.
+
+    @param masterListImpression     This is a pointer to a struct that contains the impression and the 
+                                    symptoms associated with it.
+    @param masterListSymptom    a pointer to a struct that contains a list of symptoms.
  */
 void displaySymptoms(String50 impression, pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
     int counter, counter2;
@@ -460,10 +472,10 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
 
 
 /**
- * It reads the impressions file and stores the data in a struct
- * 
- * @param masterListImpression an array of structs that holds the impressions
- * @param fp_impressions the file pointer to the file that contains the impressions
+    It reads the impressions file and stores the data in a struct.
+
+    @param masterListImpression     an array of structs that holds the impressions.
+    @param fp_impressions   the file pointer to the file that contains the impressions.
  */
 void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
     int impressionCount, index;
@@ -523,9 +535,9 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
 
 
 /**
- * It checks if the files exist and if they are empty.
- * 
- * @return the value 1 or 2 depending on whether the files exist and are empty.
+    It checks if the files exist and if they are empty.
+ 
+    @return the value 1 or 2 depending on whether the files exist and are empty.
  */
 int filesExists() {
     FILE *fp_impressions;
@@ -563,12 +575,13 @@ int filesExists() {
     return 1;
 }
 
+
 /**
- * The function reads the number of symptoms from the file, then reads the symptom and the question for
- * each symptom
- * 
- * @param masterListSymptom a pointer to a struct that contains the symptom and the question
- * @param fp_symptoms the file pointer to the file that contains the symptoms
+    The function reads the number of symptoms from the file, then reads the symptom and the question for
+    each symptom.
+ 
+    @param masterListSymptom    a pointer to a struct that contains the symptom and the question.
+    @param fp_symptoms  the file pointer to the file that contains the symptoms.
  */
 void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
     int counter, dumpIndex;
@@ -583,12 +596,13 @@ void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
 
 }
 
+
 /**
- * If the impressionBool and symptomBool are both 1, then return 1, else return 0.
- * 
- * @param isFilesExtracted a struct that contains two bools, one for each file.
- * 
- * @return an integer.
+    If the impressionBool and symptomBool are both 1, then return 1, else return 0.
+ 
+    @param isFilesExtracted     a struct that contains two bools, one for each file.
+   
+    @return an integer.
  */
 int ifExtracted(filesExtracted* isFilesExtracted) {
     if (isFilesExtracted->impressionBool == 1 && isFilesExtracted->symptomBool == 1) {
@@ -599,13 +613,12 @@ int ifExtracted(filesExtracted* isFilesExtracted) {
 }
 
 
-
 /**
- * It reads the symptoms and impressions from the files and stores them in the linked lists.
- * 
- * @param masterListImpression a struct that contains the impressions
- * @param masterListSymptom a linked list of symptoms
- * @param isFilesExtracted a struct that contains two bools, one for symptoms and one for impressions.
+    It reads the symptoms and impressions from the files and stores them in the linked lists.
+  
+    @param masterListImpression     a struct that contains the impressions.
+    @param masterListSymptom    a linked list of symptoms.
+    @param isFilesExtracted     a struct that contains two bools, one for symptoms and one for impressions.
  */
 void extractList(pairImpression* masterListImpression, pairSymptom* masterListSymptom, filesExtracted* isFilesExtracted) {
     FILE *fp_impressions;
@@ -631,11 +644,11 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
 
 
 /**
- * It asks the user for an impression, then displays the symptoms of that impression, then asks the
- * user to modify the symptoms of that impression.
- * 
- * @param masterListImpression a struct that contains the impression and the amount of symptoms it has.
- * @param masterListSymptom a struct that contains the symptoms
+    It asks the user for an impression, then displays the symptoms of that impression, then asks the
+    user to modify the symptoms of that impression.
+   
+    @param masterListImpression     a struct that contains the impression and the amount of symptoms it has.
+    @param masterListSymptom    a struct that contains the symptoms
  */
 void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
     int impressionIndex;
@@ -685,16 +698,17 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 
 }
 
+
 /**
- * It's a function that takes in a character, two structs, and a struct pointer. It then checks the
- * character and does a switch case
- * 
- * @param choice the choice of the user
- * @param masterListSymptom a pointer to a struct that contains the symptoms and the amount of
- * symptoms.
- * @param masterListImpression a struct that contains the impression and the amount of impressions.
- * @param isFilesExtracted a struct that contains the boolean values of whether the files have been
- * extracted or not.
+    It's a function that takes in a character, two structs, and a struct pointer. It then checks the
+    character and does a switch case.
+   
+    @param choice   the choice of the user.
+    @param masterListSymptom    a pointer to a struct that contains the symptoms and the amount of
+                                symptoms.
+    @param masterListImpression     a struct that contains the impression and the amount of impressions.
+    @param isFilesExtracted     a struct that contains the boolean values of whether the files have been
+                                extracted or not.
  */
 void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression, filesExtracted* isFilesExtracted) {
     String50 impression;
@@ -759,10 +773,11 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
     system("clear || cls");
 }
 
+
 /**
- * It prints the patient's information to a file.
- * 
- * @param patient a pointer to a patientInformation struct
+    It prints the patient's information to a file.
+   
+    @param patient  a pointer to a patientInformation struct.
  */
 void printPatientInfo(patientInformation *patient) {
     FILE *fp_patient;
@@ -829,14 +844,15 @@ void printPatientInfo(patientInformation *patient) {
     displayKey();
 }
 
+
 /**
- * It compares the symptoms of the patient to the symptoms of the master list of impressions. If the
- * symptoms match, the impression is added to the patient's impression list
- * 
- * @param patient a struct that contains the patient's symptoms and impressions
- * @param masterListSymptom a struct that contains the symptom and its index
- * @param masterListImpression a struct that contains the impression and the symptoms that are
- * associated with it.
+    It compares the symptoms of the patient to the symptoms of the master list of impressions. If the
+    symptoms match, the impression is added to the patient's impression list.
+   
+    @param patient  a struct that contains the patient's symptoms and impressions.
+    @param masterListSymptom    a struct that contains the symptom and its index.
+    @param masterListImpression     a struct that contains the impression and the symptoms that are
+                                    associated with it.
  */
 void getPatientImpression (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression) {
     int counter1;
@@ -866,12 +882,13 @@ void getPatientImpression (patientInformation *patient, pairSymptom *masterListS
     patient->patientImpAmt = impressionIndex;
 }
 
+
 /**
- * The function asks the user to input a Y or N for each symptom in the master list of symptoms. If the
- * user inputs a Y, the symptom is added to the patient's list of symptoms
- * 
- * @param patient a struct that holds the patient's information
- * @param masterListSymptom This is a pointer to a struct that contains a list of symptoms.
+    The function asks the user to input a Y or N for each symptom in the master list of symptoms. If the
+    user inputs a Y, the symptom is added to the patient's list of symptoms.
+   
+    @param patient  a struct that holds the patient's information.
+    @param masterListSymptom    This is a pointer to a struct that contains a list of symptoms.
  */
 void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSymptom)
 {
@@ -898,11 +915,12 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
     patient->patientSympAmt = symptomIndex;
 }
 
+
 /**
- * It takes a pointer to a patientInformation struct, and then it loops through the patientSymptoms and
- * patientImpressions arrays, and sets each element to an empty string
- * 
- * @param patient a pointer to a patientInformation struct
+    It takes a pointer to a patientInformation struct, and then it loops through the patientSymptoms and
+    patientImpressions arrays, and sets each element to an empty string.
+    
+    @param patient  a pointer to a patientInformation struct.
  */
 void emptyHistory(patientInformation *patient) {
     int symp, imp;
@@ -917,13 +935,14 @@ void emptyHistory(patientInformation *patient) {
     patient->patientImpAmt = 0;
 }
 
+
 /**
- * It asks the user for their name, age, gender, and then asks them a series of questions about their
- * symptoms and impressions
- * 
- * @param patient a struct that contains the patient's information
- * @param masterListSymptom a linked list of symptoms
- * @param masterListImpression a linked list of impressions
+    It asks the user for their name, age, gender, and then asks them a series of questions about their
+    symptoms and impressions.
+   
+    @param patient  a struct that contains the patient's information.
+    @param masterListSymptom    a linked list of symptoms.
+    @param masterListImpression     a linked list of impressions.
  */
 void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression)
 {
