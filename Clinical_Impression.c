@@ -5,7 +5,7 @@
  * Programmed by:     John Kovie L. Niño
  *                    Reign Elaiza D. Larraquel
  * 
- * Last modified:     Jun 13, 2022
+ * Last modified:     Jun 14, 2022
  * Version:           1.0
  * Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
  *                      and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
@@ -206,14 +206,14 @@ void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
     fclose(fp_symptoms);
 }
 
-/*
-    Gathers information from the Doctor user, the name of each symptom and its corresponding question.
 
-    @param masterListSymptom    The list of symptoms and questions
-    @param fp_symptoms          The file pointer to the file containing the list of symptoms and questions
-    @param masterListImpression The list of impressions
-*/
-void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImpression) {
+/**
+ * It asks the user for the number of symptoms they want to consider, then asks for the name of each
+ * symptom and its corresponding question
+ * 
+ * @param masterListSymptom a pointer to a struct that contains the symptom and the question
+ */
+void inputSymptoms(pairSymptom* masterListSymptom) {
     FILE *fp_symptoms;
     int counter;
     int noSymptoms;
@@ -240,7 +240,7 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
             printf("What is the symptom?  ");
             scanf(" %[^\n]", masterListSymptom[counter].symptom);
             if (strlen(masterListSymptom[counter].symptom) > MAX_STRING_SIZE) {
-                printf("\n\nInvalid symptom. Please try again.\n\n");
+                printf("\n\nYour input went over the string lentgth. Please try again.\n\n");
                 sleepDelay(1);
             }
         } while (strlen(masterListSymptom[counter].symptom) > MAX_STRING_SIZE);
@@ -251,10 +251,16 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
             scanf(" %[^\n]", masterListSymptom[counter].question);
 
             if (strlen(masterListSymptom[counter].question) > MAX_STRING_SIZE) {
-                printf("\n\nInvalid question. Please try again.\n\n");
+                printf("\n\nYour input went over the string lentgth. Please try again.\n\n");
                 sleepDelay(1);
             }
         } while (strlen(masterListSymptom[counter].question) > MAX_STRING_SIZE);
+
+        // add question mark at the end if there is no question mark
+        if (masterListSymptom[counter].question[strlen(masterListSymptom[counter].question) - 1] != '?') {
+            strcat(masterListSymptom[counter].question, "?");
+        }
+
         strcat(masterListSymptom[counter].question, " [Y/N]"); // add a [Y/N] to the question
     }
 
@@ -271,7 +277,7 @@ void inputSymptoms(pairSymptom* masterListSymptom, pairImpression* masterListImp
     @param masterListSymptom      is the list of symptoms and questions
     @param fp_impression          is the file that will contain the impressions and their corresponding symptoms
 */
-void printImpressions(pairImpression* masterListImpression, pairSymptom* masterListSymptom, FILE *fp_impressions) {
+void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
     int counter, counter2;
     fp_impressions = fopen("Impressions.txt", "w");
 
@@ -387,7 +393,7 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
     }
 
     masterListImpression->impressionsAmount = noImpressions; // set the number of impressions in the master list
-    printImpressions(masterListImpression, masterListSymptom, fp_impressions); // write the impressions to the file
+    printImpressions(masterListImpression, fp_impressions); // write the impressions to the file
 }
 
 
@@ -453,17 +459,17 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
 }
 
 
-/**
+/**sa
  * It reads the impressions file and stores the data in a struct
  * 
  * @param masterListImpression an array of structs that holds the impressions
- * @param masterListSymptom a pointer to a struct that contains an array of structs.
  * @param fp_impressions the file pointer to the file that contains the impressions
  */
-void readImpressions(pairImpression* masterListImpression, pairSymptom* masterListSymptom, FILE *fp_impressions) {
+void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
     int impressionCount, index;
-    String50 line;
-    fgets(line, 50, fp_impressions);
+    char line[60];
+    
+    fgets(line, MAX_STRING_SIZE, fp_impressions);
     sscanf(line, "%d", &impressionCount); // get the number of impressions
 
     masterListImpression->impressionsAmount = impressionCount;
@@ -471,7 +477,7 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
     int i, j, k;
     for (i = 1; i <= impressionCount * 3; i++) {
         fgets(line, MAX_STRING_SIZE, fp_impressions);
-        line[strlen(line) - 1] = '\0';
+        line[strlen(line) - 1] = '\0'; // remove the newline character
         switch (i % 3) {
             case 1: { //index
                 sscanf(line, "%d", &index);
@@ -488,7 +494,7 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
                         symptomNum[sympIndex] = line[j];
                         sympIndex++;
                     }
-                    else if (line[j] == ' ' && sympIndex > 0 || j == strlen(line) - 1) {
+                    else if ((line[j] == ' ' && sympIndex > 0) || j == strlen(line) - 1) {
                         sympNum = atoi(symptomNum); // convert the string to an integer
                         masterListImpression[index - 1].symptomsIndexPerImpression[impIndex] = sympNum - 1; // subtract 1 to match the index of the symptom in the master list
                         
@@ -498,7 +504,6 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
                         for (k = 0; k < length; k++) {
                             symptomNum[k] = '\0';
                         }
-                        //strcpy(symptomNum, " "); // reset the string
                         impIndex++; // increment the index of the symptom in the impression
                         sympIndex = 0; // reset the index of the symptomNum
                     }
@@ -508,7 +513,6 @@ void readImpressions(pairImpression* masterListImpression, pairSymptom* masterLi
             }
                 break;
             case 2: { //diagnosis
-                
                 strcpy(masterListImpression[index - 1].impression, line);
             }
                 break;
@@ -590,9 +594,8 @@ int ifExtracted(filesExtracted* isFilesExtracted) {
     if (isFilesExtracted->impressionBool == 1 && isFilesExtracted->symptomBool == 1) {
         return 1;
     }
-    else {
-        return 0;
-    }
+    
+    return 0;
 }
 
 
@@ -613,7 +616,7 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
 
     if (filesExists()) {
         readSymptoms(masterListSymptom, fp_symptoms); // read the symptoms from the file
-        readImpressions(masterListImpression, masterListSymptom, fp_impressions); // read the impressions from the file
+        readImpressions(masterListImpression, fp_impressions); // read the impressions from the file
 
         printf("\nSymptoms and Impressions has been extracted from the files.\n");
         isFilesExtracted->impressionBool = 1;
@@ -672,7 +675,7 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 
     sleepDelay(1);
     assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
-    printImpressions(masterListImpression, masterListSymptom, fp_impressions);
+    printImpressions(masterListImpression, fp_impressions);
 
     sleepDelay(1);
     printf("\n\nSymptoms for %s have been modified.\n", impression);
@@ -703,7 +706,7 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
     switch(choice) {
         case 'C':
         case 'c':
-            inputSymptoms(masterListSymptom, masterListImpression);
+            inputSymptoms(masterListSymptom);
             isFilesExtracted->symptomBool = 1;
             system("clear || cls");
             inputImpression(masterListImpression, masterListSymptom);
@@ -964,7 +967,7 @@ int main() {
     char cMenuChoice;
     
     do {
-        system("clear || cls");
+        //system("clear || cls");
         cMenuChoice = userType();
         switch (cMenuChoice) {
             case 'D':
