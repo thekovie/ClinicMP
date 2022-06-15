@@ -316,7 +316,7 @@ void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions
     @param masterListSymptom     is a pointer to a struct that contains the list of symptoms
     @param impressionIndex   the index of the current impression
  */
-void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom, int impressionIndex){
+void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom, int impressionIndex) {
     int presentSymptoms;
     int counter2;
     int symptomIndex;
@@ -333,11 +333,11 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
         printf("\nHow many symptoms are present in the case? ");
         scanf("%d", &presentSymptoms);
         
-        if (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS) {
+        if (presentSymptoms <= 0 || presentSymptoms > masterListSymptom->overallSymptomsAmt) {
             printf("\n\nInvalid number of symptoms. Please try again.\n\n"); // If the number of symptoms is invalid
             sleepDelay(1);
         }
-    } while (presentSymptoms <= 0 || presentSymptoms > MAX_SYMPTOMS);
+    } while (presentSymptoms <= 0 || presentSymptoms > masterListSymptom->overallSymptomsAmt);
 
     // assigns no. of symptoms to the current impression
     masterListImpression[impressionIndex].symptomsAmountPerImpression = presentSymptoms;
@@ -410,28 +410,6 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
 
 
 /**
-    It takes in a symptom index and a pointer to a list of symptoms, and returns the symptom at the
-    index.
-
-    @param symptomIndex         The index of the symptom in the master list of symptoms.
-    @param masterListSymptom    This is a pointer to a struct that contains a list of symptoms.
-
-    @return The symptom that is associated with the symptomIndex.
- */
-char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
-    int i;
-
-    for (i =  0; i < masterListSymptom->overallSymptomsAmt; i++) {
-        if (i == symptomIndex) {
-            return masterListSymptom[i].symptom;
-        }
-    }
-
-    return "";
-}
-
-
-/**
     It checks if a given impression is present in the master list of impressions.
 
     @param masterListImpression     is a pointer to a struct that contains a char* and an int.
@@ -439,7 +417,7 @@ char* outputSymptom(int symptomIndex, pairSymptom* masterListSymptom){
 
     @return an integer.
  */
-int isImpressionPresent(pairImpression* masterListImpression, char* impression){
+int isImpressionPresent(pairImpression* masterListImpression, char* impression) {
     int i;
     for (i = 0; i < masterListImpression->impressionsAmount; i++) {
         if (strcmp(masterListImpression[i].impression, impression) == 0) {
@@ -467,7 +445,7 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
             printf("\nThe symptoms for %s are:\n", impression);
             for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) {
-                printf(" %s\n", outputSymptom(masterListImpression[counter].symptomsIndexPerImpression[counter2], masterListSymptom));
+                printf(" %s\n", masterListSymptom[counter2].symptom);
             }
         }
     }
@@ -548,7 +526,7 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
 /**
     It checks if the files exist and if they are empty.
  
-    @return the value 1 or 2 depending on whether the files exist and are empty.
+    @return the value 1 or 0 depending on whether the files exist and are empty.
  */
 int filesExists() {
     FILE *fp_impressions;
@@ -617,7 +595,6 @@ int ifExtracted(filesExtracted* isFilesExtracted) {
     if (isFilesExtracted->impressionBool == 1 && isFilesExtracted->symptomBool == 1) {
         return 1;
     }
-    
     return 0;
 }
 
@@ -653,7 +630,7 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
 
 
 /**
-    It asks the user for an impression, then displays the symptoms of that impression, then asks the
+    It asks the user for an impression, then displays the symptoms of that impression, theIn asks the
     user to modify the symptoms of that impression.
    
     @param masterListImpression     a struct that contains the impression and the amount of symptoms it has.
@@ -896,15 +873,15 @@ void getPatientImpression (patientInformation *patient, pairSymptom *masterListS
     int matchSymptom = 0;
     int impressionIndex = 0;
 
-    for(counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++){
-        for(counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++){
-            for(counter3 = 0; counter3 < patient->patientSympAmt; counter3++) {
-                if(strcmp(outputSymptom(masterListImpression[counter1].symptomsIndexPerImpression[counter2], masterListSymptom), patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
+    for (counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++) {
+        for (counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++) {
+            for (counter3 = 0; counter3 < patient->patientSympAmt; counter3++) {
+                if (strcmp(masterListSymptom[masterListImpression[counter1].symptomsIndexPerImpression[counter2]].symptom, patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
                     matchSymptom += 1;
                 }
             }
 
-            if(matchSymptom == masterListImpression[counter1].symptomsAmountPerImpression){
+            if (matchSymptom == masterListImpression[counter1].symptomsAmountPerImpression){
                 strcpy(patient->patientImpressions[impressionIndex].impression, masterListImpression[counter1].impression);
                 impressionIndex += 1;
             }         
@@ -936,7 +913,7 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
             printf("%s  ", masterListSymptom[counter].question);
             scanf(" %c", &answer);
 
-            if(answer == 'Y' || answer == 'y') {
+            if (answer == 'Y' || answer == 'y') {
                 strcpy(patient->patientSymptoms[symptomIndex].symptom, masterListSymptom[counter].symptom);
                 symptomIndex += 1;
             }
