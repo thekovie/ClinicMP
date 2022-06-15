@@ -5,7 +5,7 @@
     Programmed by:     John Kovie L. Niño
                        Reign Elaiza D. Larraquel
     
-    Last modified:     Jun 14, 2022
+    Last modified:     Jun 15, 2022
     Version:           1.0
     Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
                         and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
@@ -38,7 +38,8 @@ typedef char String50[MAX_STRING_SIZE]; // String of 50 characters
     @property {int} symptomBool     1 if 'Symptoms.txt' has been extracted, 0 if it doesn't.
     @property {int} impressionBool  1 if 'Impressions.txt' has been extracted, 0 if it doesn't.
  */
-typedef struct filesExtracted {
+typedef struct filesExtracted 
+{
     int symptomBool;
     int impressionBool;
 } filesExtracted;
@@ -111,7 +112,9 @@ typedef struct patientInformation
 
     @param n    The number of seconds to sleep.
  */
-void sleepDelay (int n) {
+void 
+sleepDelay (int n) 
+{
     #if defined(_WIN32)
         Sleep(1000*n);
     #else
@@ -123,7 +126,9 @@ void sleepDelay (int n) {
 /**
     It waits for the user to press a key.
  */
-void displayKey () {
+void 
+displayKey () 
+{
     printf("\n\nPress any key to continue...\n");
     #if defined(_WIN32) && !defined(UNIX) // If the system is Windows
         getch();
@@ -139,7 +144,9 @@ void displayKey () {
   
     @return The user's choice.
  */
-char userType() {
+char 
+userType() 
+{
     char choice;
 
     do {
@@ -167,7 +174,9 @@ char userType() {
 
     @return The choice of the user.
  */
-char doctorMenu() {
+char 
+doctorMenu() 
+{
     char choice;
 
     do {
@@ -199,7 +208,11 @@ char doctorMenu() {
     @param fp_symptoms  is  the file that will contain the symptoms.
     @param N    is the number of symptoms.
 */
-void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
+void 
+writeSymptoms(pairSymptom* masterListSymptom, 
+              FILE *fp_symptoms, 
+              int N) 
+{
     int counter;
     fp_symptoms = fopen("Symptoms.txt", "w");
 
@@ -220,7 +233,9 @@ void writeSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms, int N) {
 
     @param masterListSymptom    a pointer to a struct that contains the symptom and the question.
  */
-void inputSymptoms(pairSymptom* masterListSymptom) {
+void 
+inputSymptoms(pairSymptom* masterListSymptom) 
+{
     FILE *fp_symptoms;
     int counter;
     int noSymptoms;
@@ -284,7 +299,10 @@ void inputSymptoms(pairSymptom* masterListSymptom) {
     @param masterListSymptom    is the list of symptoms and questions.
     @param fp_impression    is the file that will contain the impressions and their corresponding symptoms.
 */
-void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
+void 
+printImpressions (pairImpression* masterListImpression, 
+                  FILE *fp_impressions) 
+{
     int counter;
     int counter2;
 
@@ -316,7 +334,11 @@ void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions
     @param masterListSymptom     is a pointer to a struct that contains the list of symptoms
     @param impressionIndex   the index of the current impression
  */
-void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom, int impressionIndex) {
+void 
+assignSymptoms (pairImpression* masterListImpression, 
+                pairSymptom* masterListSymptom, 
+                int impressionIndex) 
+{
     int presentSymptoms;
     int counter2;
     int symptomIndex;
@@ -345,7 +367,7 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     // assigns the symptoms to the current impression
     printf("Enter the corresponding number of each symptom:\n");
 
-    for(counter2 = 0; counter2 < presentSymptoms; counter2++){
+    for (counter2 = 0; counter2 < presentSymptoms; counter2++) {
         // check if the symptom is valid
         do {
             printf("Symptom # %d: ", counter2 + 1);
@@ -369,7 +391,10 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     @param masterListImpression     The list of impressions
     @param masterListSymptom        The list of symptoms and questions
 */
-void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
+void 
+inputImpression (pairImpression* masterListImpression, 
+                 pairSymptom* masterListSymptom) 
+{
     int noImpressions = 0;
     int counter1;
     FILE *fp_impressions;
@@ -417,7 +442,10 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
 
     @return an integer.
  */
-int isImpressionPresent(pairImpression* masterListImpression, char* impression) {
+int 
+isImpressionPresent (pairImpression* masterListImpression, 
+                    char* impression) 
+{
     int i;
     for (i = 0; i < masterListImpression->impressionsAmount; i++) {
         if (strcmp(masterListImpression[i].impression, impression) == 0) {
@@ -437,7 +465,11 @@ int isImpressionPresent(pairImpression* masterListImpression, char* impression) 
                                     symptoms associated with it.
     @param masterListSymptom    a pointer to a struct that contains a list of symptoms.
  */
-void displaySymptoms(String50 impression, pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
+void 
+displaySymptoms(String50 impression, 
+                pairImpression* masterListImpression,
+                pairSymptom* masterListSymptom)
+{ 
     int counter;
     int counter2;
 
@@ -458,7 +490,10 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
     @param masterListImpression     an array of structs that holds the impressions.
     @param fp_impressions   the file pointer to the file that contains the impressions.
  */
-void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
+void 
+readImpressions(pairImpression* masterListImpression, 
+                FILE *fp_impressions) 
+{
     int impressionCount; 
     int index;
     int i;
@@ -528,7 +563,9 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
  
     @return the value 1 or 0 depending on whether the files exist and are empty.
  */
-int filesExists() {
+int 
+filesExists() 
+{
     FILE *fp_impressions;
     FILE *fp_symptoms;
 
@@ -569,7 +606,10 @@ int filesExists() {
     @param masterListSymptom    a pointer to a struct that contains the symptom and the question.
     @param fp_symptoms  the file pointer to the file that contains the symptoms.
  */
-void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
+void 
+readSymptoms (pairSymptom* masterListSymptom, 
+              FILE *fp_symptoms) 
+{
     int counter;
     int dumpIndex;
 
@@ -591,7 +631,9 @@ void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
    
     @return a 1 or 0.
  */
-int ifExtracted(filesExtracted* isFilesExtracted) {
+int 
+ifExtracted (filesExtracted* isFilesExtracted) 
+{
     if (isFilesExtracted->impressionBool == 1 && isFilesExtracted->symptomBool == 1) {
         return 1;
     }
@@ -606,7 +648,11 @@ int ifExtracted(filesExtracted* isFilesExtracted) {
     @param masterListSymptom    a linked list of symptoms.
     @param isFilesExtracted     a struct that contains two bools, one for symptoms and one for impressions.
  */
-void extractList(pairImpression* masterListImpression, pairSymptom* masterListSymptom, filesExtracted* isFilesExtracted) {
+void 
+extractList (pairImpression* masterListImpression, 
+             pairSymptom* masterListSymptom, 
+             filesExtracted* isFilesExtracted) 
+{
     FILE *fp_impressions;
     FILE *fp_symptoms;
 
@@ -636,7 +682,10 @@ void extractList(pairImpression* masterListImpression, pairSymptom* masterListSy
     @param masterListImpression     a struct that contains the impression and the amount of symptoms it has.
     @param masterListSymptom    a struct that contains the symptoms
  */
-void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
+void 
+modifySymptoms (pairImpression* masterListImpression, 
+                pairSymptom* masterListSymptom) 
+{
     int impressionIndex;
     String50 impression;
     FILE *fp_impressions;
@@ -699,7 +748,12 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     @param isFilesExtracted     a struct that contains the boolean values of whether the files have been
                                 extracted or not.
  */
-void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* masterListImpression, filesExtracted* isFilesExtracted) {
+void 
+doctorChoice (char choice, 
+              pairSymptom* masterListSymptom, 
+              pairImpression* masterListImpression, 
+              filesExtracted* isFilesExtracted) 
+{
     String50 impression;
     int counter;
 
@@ -770,7 +824,9 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
    
     @param patient  a pointer to a patientInformation struct.
  */
-void printPatientInfo(patientInformation *patient) {
+void 
+printPatientInfo (patientInformation *patient) 
+{
     FILE *fp_patient;
     String50 filename;
     int counter;
@@ -866,7 +922,11 @@ void printPatientInfo(patientInformation *patient) {
     @param masterListImpression     a struct that contains the impression and the symptoms that are
                                     associated with it.
  */
-void getPatientImpression (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression) {
+void 
+getPatientImpression (patientInformation *patient, 
+                      pairSymptom *masterListSymptom, 
+                      pairImpression *masterListImpression) 
+{
     int counter1;
     int counter2;
     int counter3;
@@ -902,7 +962,9 @@ void getPatientImpression (patientInformation *patient, pairSymptom *masterListS
     @param patient  a struct that holds the patient's information.
     @param masterListSymptom    This is a pointer to a struct that contains a list of symptoms.
  */
-void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSymptom)
+void 
+getPatientSymptoms (patientInformation *patient,
+                    pairSymptom *masterListSymptom)
 {
     char answer;
     int counter;
@@ -934,7 +996,9 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
     
     @param patient  a pointer to a patientInformation struct.
  */
-void emptyHistory(patientInformation *patient) {
+void 
+emptyHistory (patientInformation *patient) 
+{
     int symp;
     int imp;
 
@@ -958,7 +1022,10 @@ void emptyHistory(patientInformation *patient) {
     @param masterListSymptom    a linked list of symptoms.
     @param masterListImpression     a linked list of impressions.
  */
-void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom, pairImpression *masterListImpression)
+void 
+getPatientInfo (patientInformation *patient, 
+                pairSymptom *masterListSymptom, 
+                pairImpression *masterListImpression)
 {
     printf("What is your name? ");
     scanf(" %[^\n]", patient->name);
@@ -990,7 +1057,9 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
 }
 
 
-int main() {
+int 
+main() 
+{
     pairSymptom masterListSymptom[MAX_SYMPTOMS];
     pairImpression masterListImpression[MAX_IMPRESSION];
     filesExtracted isFilesExtracted;
