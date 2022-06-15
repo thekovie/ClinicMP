@@ -285,7 +285,9 @@ void inputSymptoms(pairSymptom* masterListSymptom) {
     @param fp_impression    is the file that will contain the impressions and their corresponding symptoms.
 */
 void printImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
-    int counter, counter2;
+    int counter;
+    int counter2;
+
     fp_impressions = fopen("Impressions.txt", "w");
 
     fprintf(fp_impressions, "%d\n", masterListImpression->impressionsAmount); // write the number of impressions to the file
@@ -365,7 +367,7 @@ void assignSymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     symptoms that are under it.
 
     @param masterListImpression     The list of impressions
-    @param masterListSymptom    The list of symptoms and questions
+    @param masterListSymptom        The list of symptoms and questions
 */
 void inputImpression(pairImpression* masterListImpression, pairSymptom* masterListSymptom) {
     int noImpressions = 0;
@@ -411,7 +413,7 @@ void inputImpression(pairImpression* masterListImpression, pairSymptom* masterLi
     It takes in a symptom index and a pointer to a list of symptoms, and returns the symptom at the
     index.
 
-    @param symptomIndex     The index of the symptom in the master list of symptoms.
+    @param symptomIndex         The index of the symptom in the master list of symptoms.
     @param masterListSymptom    This is a pointer to a struct that contains a list of symptoms.
 
     @return The symptom that is associated with the symptomIndex.
@@ -458,7 +460,8 @@ int isImpressionPresent(pairImpression* masterListImpression, char* impression){
     @param masterListSymptom    a pointer to a struct that contains a list of symptoms.
  */
 void displaySymptoms(String50 impression, pairImpression* masterListImpression, pairSymptom* masterListSymptom) { 
-    int counter, counter2;
+    int counter;
+    int counter2;
 
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
@@ -478,7 +481,11 @@ void displaySymptoms(String50 impression, pairImpression* masterListImpression, 
     @param fp_impressions   the file pointer to the file that contains the impressions.
  */
 void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions) {
-    int impressionCount, index;
+    int impressionCount; 
+    int index;
+    int i;
+    int j;
+    int k;
     char line[60];
     
     fgets(line, MAX_STRING_SIZE, fp_impressions);
@@ -486,10 +493,10 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
 
     masterListImpression->impressionsAmount = impressionCount;
 
-    int i, j, k;
     for (i = 1; i <= impressionCount * 3; i++) {
         fgets(line, MAX_STRING_SIZE, fp_impressions);
         line[strlen(line) - 1] = '\0'; // remove the newline character
+
         switch (i % 3) {
             case 1: { //index
                 sscanf(line, "%d", &index);
@@ -502,11 +509,15 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
                 int impIndex = 0; // the index of the impression in the master list
 
                 for (j = 0; j < strlen(line); j++) {
+
+                    // if the character is a space, then we have reached the end of the symptom number
                     if (line[j] != ' ') {
                         symptomNum[sympIndex] = line[j];
                         sympIndex++;
                     }
-                    else if ((line[j] == ' ' && sympIndex > 0) || j == strlen(line) - 1) {
+
+    
+                    else if ((line[j] == ' ' && sympIndex > 0) || j == strlen(line) - 1) { 
                         sympNum = atoi(symptomNum); // convert the string to an integer
                         masterListImpression[index - 1].symptomsIndexPerImpression[impIndex] = sympNum - 1; // subtract 1 to match the index of the symptom in the master list
                         
@@ -520,7 +531,7 @@ void readImpressions(pairImpression* masterListImpression, FILE *fp_impressions)
                         sympIndex = 0; // reset the index of the symptomNum
                     }
                 }
-                masterListImpression[index - 1].symptomsAmountPerImpression = impIndex;
+                masterListImpression[index - 1].symptomsAmountPerImpression = impIndex; // set the number of symptoms per impression
                 
             }
                 break;
@@ -548,22 +559,19 @@ int filesExists() {
 
     int size = 0;
     int size2 = 0;
-    
-
-    fp_impressions = fopen("impressions.txt", "r");
-    fp_symptoms = fopen("symptoms.txt", "r");
 
     if (fp_impressions == NULL || fp_symptoms == NULL) {
         printf("\n\nThe file/s does not exist.\n\n");
         return 0;
     }
 
-    while (fgetc(fp_impressions) != EOF)
+    while (fgetc(fp_impressions) != EOF) {
         size++;
+    }
 
-
-    while (fgetc(fp_symptoms) != EOF)
+    while (fgetc(fp_symptoms) != EOF) {
         size2++;
+    }
 
     if (size == 0 || size2 == 0) {
         printf("\nImpressions or Symptoms textfile is empty.\n\n");
@@ -584,7 +592,8 @@ int filesExists() {
     @param fp_symptoms  the file pointer to the file that contains the symptoms.
  */
 void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
-    int counter, dumpIndex;
+    int counter;
+    int dumpIndex;
 
     fscanf(fp_symptoms, "%d", &masterListSymptom->overallSymptomsAmt); // read the number of symptoms from the file
 
@@ -598,11 +607,11 @@ void readSymptoms(pairSymptom* masterListSymptom, FILE *fp_symptoms) {
 
 
 /**
-    If the impressionBool and symptomBool are both 1, then return 1, else return 0.
+    The function checks if both Impressions and Symptoms has been extracted
  
     @param isFilesExtracted     a struct that contains two bools, one for each file.
    
-    @return an integer.
+    @return a 1 or 0.
  */
 int ifExtracted(filesExtracted* isFilesExtracted) {
     if (isFilesExtracted->impressionBool == 1 && isFilesExtracted->symptomBool == 1) {
@@ -657,8 +666,9 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
     int counter;
 
     printf("\n\nList of Impressions:\n");
-    for (counter = 0; counter < masterListImpression->impressionsAmount; counter++)
+    for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         printf("- %s\n",masterListImpression[counter].impression);
+    }
     printf("\n");
 
     do {
@@ -691,6 +701,8 @@ void modifySymptoms(pairImpression* masterListImpression, pairSymptom* masterLis
 
     sleepDelay(1);
     printf("\n\nSymptoms for %s have been modified.\n", impression);
+
+    displaySymptoms(impression, masterListImpression, masterListSymptom);
 
     sleepDelay(1);
     fclose(fp_impressions);
@@ -729,8 +741,9 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
         case 'd':
             if (ifExtracted(isFilesExtracted)) {
                 printf("\n\nList of Impressions:\n");
-                for (counter = 0; counter < masterListImpression->impressionsAmount; counter++)
+                for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
                     printf("- %s\n",masterListImpression[counter].impression);
+                }
                 printf("\n");
 
                 do {
@@ -746,8 +759,9 @@ void doctorChoice(char choice, pairSymptom* masterListSymptom, pairImpression* m
                 sleepDelay(1);
                 displaySymptoms(impression, masterListImpression, masterListSymptom);
             }
-            else
+            else {
                 printf("\n[ERROR!] You cannot enter this option yet. Load the database first.\n\n");
+            }
             
             displayKey();
 
@@ -794,53 +808,74 @@ void printPatientInfo(patientInformation *patient) {
 
 
     fprintf(fp_patient, "History of Patient Illness\n\n");
-    fprintf(fp_patient, "%s, patient # %d is a %d-year old ", patient->name, patient->patientno, patient->age);
-    if (patient->gender == 'M' || patient->gender == 'm')
-        fprintf(fp_patient, "male. He has ");
-    if (patient->gender == 'F' || patient->gender == 'f')
-        fprintf(fp_patient, "female. She has ");
-    for(counter = 0; counter < patient->patientSympAmt; counter++) {// print symptoms and impressions.
-        if(patient->patientSympAmt == 1)
-        {
-            fprintf(fp_patient, "%s.", patient->patientSymptoms[counter].symptom);
+    printf("\nHistory of Patient Illness\n\n");
 
+    fprintf(fp_patient, "%s, patient # %d is a %d-year old ", patient->name, patient->patientno, patient->age);
+    printf("%s, patient # %d is a %d-year old ", patient->name, patient->patientno, patient->age);
+
+    if (patient->gender == 'M' || patient->gender == 'm') {
+        fprintf(fp_patient, "male. He has ");
+        printf("male. He has ");
+    }
+        
+    if (patient->gender == 'F' || patient->gender == 'f') {
+        fprintf(fp_patient, "female. She has ");
+        printf("female. She has ");
+    }
+        
+    for (counter = 0; counter < patient->patientSympAmt; counter++) {// print symptoms and impressions.
+        if(patient->patientSympAmt == 1){
+            fprintf(fp_patient, "%s.", patient->patientSymptoms[counter].symptom);
+            printf("%s.", patient->patientSymptoms[counter].symptom);
         }
-        else if(patient->patientSympAmt > 1) {
-            if(counter < (patient->patientSympAmt - 1)){
+        else if (patient->patientSympAmt > 1) {
+            if (counter < (patient->patientSympAmt - 1)) {
                 fprintf(fp_patient, "%s, ", patient->patientSymptoms[counter].symptom);
+                printf("%s, ", patient->patientSymptoms[counter].symptom);
             }
-            else if(counter == (patient->patientSympAmt - 1)){
+            else if (counter == (patient->patientSympAmt - 1)) {
                 fprintf(fp_patient, "and %s.", patient->patientSymptoms[counter].symptom);
+                printf("and %s.", patient->patientSymptoms[counter].symptom);
             }
         }
     }
-    if (patient->patientImpAmt == 0)
-            fprintf(fp_patient, " There are no impressions to be formed based on the symptoms present or observed.");
-    else
+    if (patient->patientImpAmt == 0) {
+        fprintf(fp_patient, " There are no impressions to be formed based on the symptoms present or observed.");
+        printf(" There are no impressions to be formed based on the symptoms present or observed.");
+    }
+    else if (patient->patientImpAmt == 1) {
+        fprintf(fp_patient, " The impression is ");
+        printf(" The impression is ");
+    }    
+    else {
         fprintf(fp_patient, " Impressions are ");
+        printf(" Impressions are ");
+    }
+        
 
-    for(counter2 = 0; counter2 < patient->patientImpAmt; counter2++) {// print symptoms and impressions.
-        if(patient->patientImpAmt == 1)
-        {
+    for (counter2 = 0; counter2 < patient->patientImpAmt; counter2++) {// print symptoms and impressions.
+        if (patient->patientImpAmt == 1) {
             fprintf(fp_patient, "%s.", patient->patientImpressions[counter2].impression);
-
+            printf("%s.", patient->patientImpressions[counter2].impression);
         }
-        else if(patient->patientImpAmt > 1) {
-            if(counter2 < (patient->patientImpAmt - 1)){
+        else if (patient->patientImpAmt > 1) {
+            if (counter2 < (patient->patientImpAmt - 1)) {
                 fprintf(fp_patient, "%s, ", patient->patientImpressions[counter2].impression);
+                printf("%s, ", patient->patientImpressions[counter2].impression);
             }
-            else if(counter2 == (patient->patientImpAmt - 1)){
+            else if (counter2 == (patient->patientImpAmt - 1)) {
                 fprintf(fp_patient, "and %s.", patient->patientImpressions[counter2].impression);
+                printf("and %s.", patient->patientImpressions[counter2].impression);
             }
         }
 
         
     }
-    printf("\n\nGenerating HPI for Patient No. %d...\n", patient->patientno);
+    printf("\n\nGenerating HPI text file for Patient No. %d...\n", patient->patientno);
     sleepDelay(2);
     fclose(fp_patient);  
 
-    printf("History of Patient Illness for Patient No. %d has been generated.\nKindly open %d.txt to check your HPI.\n\n", patient->patientno, patient->patientno);
+    printf("History of Patient Illness text file for Patient No. %d has been generated.\nKindly open %d.txt to check your HPI.\n\n", patient->patientno, patient->patientno);
     displayKey();
 }
 
@@ -923,7 +958,9 @@ void getPatientSymptoms (patientInformation *patient, pairSymptom *masterListSym
     @param patient  a pointer to a patientInformation struct.
  */
 void emptyHistory(patientInformation *patient) {
-    int symp, imp;
+    int symp;
+    int imp;
+
     for(symp = 0; symp < patient->patientSympAmt; symp++) {
         strcpy(patient->patientSymptoms[symp].symptom, "");
     }
@@ -958,8 +995,9 @@ void getPatientInfo (patientInformation *patient, pairSymptom *masterListSymptom
         printf("Gender (M/F): ");
         scanf(" %c", &patient->gender);
 
-        if (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f'))
+        if (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f')) {
             printf("Wrong input, try again.\n\n");
+        }
     } while (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f'));
     
     emptyHistory(patient);
