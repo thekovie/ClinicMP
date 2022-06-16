@@ -5,7 +5,7 @@
     Programmed by:     John Kovie L. Niño
                        Reign Elaiza D. Larraquel
     
-    Last modified:     Jun 15, 2022
+    Last modified:     Jun 16, 2022
     Version:           1.0
     Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
                         and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
@@ -577,8 +577,8 @@ filesExists()
     FILE *fp_impressions;
     FILE *fp_symptoms;
 
-    fp_impressions = fopen("impressions.txt", "r");
-    fp_symptoms = fopen("symptoms.txt", "r");
+    fp_impressions = fopen("Impressions.txt", "r");
+    fp_symptoms = fopen("Symptoms.txt", "r");
 
     int size = 0;
     int size2 = 0;
