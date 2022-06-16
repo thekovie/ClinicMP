@@ -837,8 +837,8 @@ printPatientInfo (patientInformation *patient)
 {
     FILE *fp_patient;
     String50 filename;
-    int counter;
-    int counter2;
+    int counter = 0;
+    int counter2 = 0;
 
 
     // Set filename to patient's ID no.
@@ -851,25 +851,43 @@ printPatientInfo (patientInformation *patient)
     fprintf(fp_patient, "History of Patient Illness\n\n");
     printf("\nHistory of Patient Illness\n\n");
 
+    // Print patient's name, ID no., and age
     fprintf(fp_patient, "%s, patient # %d is a %d-year old ", patient->name, patient->patientno, patient->age);
     printf("%s, patient # %d is a %d-year old ", patient->name, patient->patientno, patient->age);
 
+    // Print patient's gender
     if (patient->gender == 'M' || patient->gender == 'm') {
-        fprintf(fp_patient, "male. He has ");
-        printf("male. He has ");
+        fprintf(fp_patient, "male.");
+        printf("male.");
     }
         
     if (patient->gender == 'F' || patient->gender == 'f') {
-        fprintf(fp_patient, "female. She has ");
-        printf("female. She has ");
+        fprintf(fp_patient, "female.");
+        printf("female.");
+    }
+
+    // Print if patient has symptoms
+    if ((patient->gender == 'M' || patient->gender == 'm') && patient->patientSympAmt > 0) {
+        fprintf(fp_patient, " He has ");
+        printf(" He has ");
     }
         
-    for (counter = 0; counter < patient->patientSympAmt; counter++) {// print symptoms and impressions.
-        if(patient->patientSympAmt == 1){
-            fprintf(fp_patient, "%s.", patient->patientSymptoms[counter].symptom);
-            printf("%s.", patient->patientSymptoms[counter].symptom);
-        }
-        else if (patient->patientSympAmt > 1) {
+    if (patient->gender == 'F' || patient->gender == 'f' && patient->patientSympAmt > 0) {
+        fprintf(fp_patient, " She has ");
+        printf(" She has ");
+    }
+    
+    // Print patient's symptoms
+    if(patient->patientSympAmt == 1){ // If the patient is experiencing only 1 symptom
+        fprintf(fp_patient, "%s.", patient->patientSymptoms[counter].symptom);
+        printf("%s.", patient->patientSymptoms[counter].symptom);
+    }
+    else if(patient->patientSympAmt == 2){ // If the patient is experiencing 2 symptoms
+        fprintf(fp_patient, "%s and %s.", patient->patientSymptoms[counter].symptom, patient->patientSymptoms[counter + 1].symptom);
+        printf("%s and %s.", patient->patientSymptoms[counter].symptom, patient->patientSymptoms[counter + 1].symptom);
+    }
+    else if (patient->patientSympAmt > 2) { // If the patient is experiencing more than 2 symptoms
+        for (counter = 0; counter < patient->patientSympAmt; counter++) { 
             if (counter < (patient->patientSympAmt - 1)) {
                 fprintf(fp_patient, "%s, ", patient->patientSymptoms[counter].symptom);
                 printf("%s, ", patient->patientSymptoms[counter].symptom);
@@ -880,6 +898,8 @@ printPatientInfo (patientInformation *patient)
             }
         }
     }
+
+    //Checks if there is an impression
     if (patient->patientImpAmt == 0) {
         fprintf(fp_patient, " There are no impressions to be formed based on the symptoms present or observed.");
         printf(" There are no impressions to be formed based on the symptoms present or observed.");
@@ -892,14 +912,18 @@ printPatientInfo (patientInformation *patient)
         fprintf(fp_patient, " Impressions are ");
         printf(" Impressions are ");
     }
-        
 
-    for (counter2 = 0; counter2 < patient->patientImpAmt; counter2++) {// print symptoms and impressions.
-        if (patient->patientImpAmt == 1) {
-            fprintf(fp_patient, "%s.", patient->patientImpressions[counter2].impression);
-            printf("%s.", patient->patientImpressions[counter2].impression);
-        }
-        else if (patient->patientImpAmt > 1) {
+    // Print patient's impressions
+    if (patient->patientImpAmt == 1) { // If the patient is experiencing only 1 impression
+        fprintf(fp_patient, "%s.", patient->patientImpressions[counter2].impression);
+        printf("%s.", patient->patientImpressions[counter2].impression);
+    }
+    else if (patient->patientImpAmt == 2) { // If the patient is experiencing 2 impressions
+        fprintf(fp_patient, "%s and %s.", patient->patientImpressions[counter2].impression, patient->patientImpressions[counter2 + 1].impression);
+        printf("%s and %s.", patient->patientImpressions[counter2].impression, patient->patientImpressions[counter2 + 1].impression);
+    }
+    else if (patient->patientImpAmt > 2) { // If the patient is experiencing more than 2 impressions
+        for (counter2 = 0; counter2 < patient->patientImpAmt; counter2++) { 
             if (counter2 < (patient->patientImpAmt - 1)) {
                 fprintf(fp_patient, "%s, ", patient->patientImpressions[counter2].impression);
                 printf("%s, ", patient->patientImpressions[counter2].impression);
@@ -909,9 +933,8 @@ printPatientInfo (patientInformation *patient)
                 printf("and %s.", patient->patientImpressions[counter2].impression);
             }
         }
-
-        
     }
+
     printf("\n\nGenerating HPI text file for Patient No. %d...\n", patient->patientno);
     sleepDelay(2);
     fclose(fp_patient);  
@@ -941,15 +964,15 @@ getPatientImpression (patientInformation *patient,
     int matchSymptom = 0;
     int impressionIndex = 0;
 
-    for (counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++) {
-        for (counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++) {
-            for (counter3 = 0; counter3 < patient->patientSympAmt; counter3++) {
-                if (strcmp(masterListSymptom[masterListImpression[counter1].symptomsIndexPerImpression[counter2]].symptom, patient->patientSymptoms[counter3].symptom) == 0){ //ISSUE: the values being compared is both empty, resulting a 0 in the strcmp and matchSymptom increasing by 1
-                    matchSymptom += 1;
+    for (counter1 = 0; counter1 < masterListImpression->impressionsAmount; counter1++) { // For each impression in the master list
+        for (counter2 = 0; counter2 < masterListImpression[counter1].symptomsAmountPerImpression; counter2++) { // For each symptom of the impression in the master list
+            for (counter3 = 0; counter3 < patient->patientSympAmt; counter3++) { // For each symptom of the patient
+                if (strcmp(masterListSymptom[masterListImpression[counter1].symptomsIndexPerImpression[counter2]].symptom, patient->patientSymptoms[counter3].symptom) == 0){
+                    matchSymptom += 1; // The amount of symptoms that match the impression
                 }
             }
 
-            if (matchSymptom == masterListImpression[counter1].symptomsAmountPerImpression){
+            if (matchSymptom == masterListImpression[counter1].symptomsAmountPerImpression){ // If the patient has all the symptoms of the impression
                 strcpy(patient->patientImpressions[impressionIndex].impression, masterListImpression[counter1].impression);
                 impressionIndex += 1;
             }         
@@ -1057,6 +1080,7 @@ getPatientInfo (patientInformation *patient,
     // ask questions to patient
     getPatientSymptoms(patient, masterListSymptom);
 
+    // get the impression for the patient 
     getPatientImpression(patient, masterListSymptom, masterListImpression);
 
     // write text file
