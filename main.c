@@ -32,7 +32,7 @@ main()
     char cMenuChoice;
     
     do {
-        //system("clear || cls");
+        system("clear || cls");
         cMenuChoice = userType();
         switch (cMenuChoice) {
             case 'D':
