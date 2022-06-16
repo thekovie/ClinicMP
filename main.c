@@ -45,7 +45,7 @@ main()
                 break;
             case 'P':
             case 'p':
-                if (ifExtracted(&isFilesExtracted)) {
+                if (ifExtracted(&isFilesExtracted)) { // If the files have been extracted then get the patient information
                     getPatientInfo(&patient, masterListSymptom, masterListImpression);
                 }
                 else {

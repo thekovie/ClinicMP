@@ -54,7 +54,7 @@ readImpressions(pairImpression* masterListImpression,
                         sympNum = atoi(symptomNum); // convert the string to an integer
                         masterListImpression[index - 1].symptomsIndexPerImpression[impIndex] = sympNum - 1; // subtract 1 to match the index of the symptom in the master list
                         
-                        int length = strlen(symptomNum);
+                        int length = strlen(symptomNum); // get the length of the string
 
                         // clear the symptomNum
                         for (k = 0; k < length; k++) {
@@ -68,7 +68,7 @@ readImpressions(pairImpression* masterListImpression,
                 
             }
                 break;
-            case 2: { //diagnosis
+            case 2: { // Impression Name
                 strcpy(masterListImpression[index - 1].impression, line);
             }
                 break;
@@ -97,19 +97,23 @@ filesExists()
     int size = 0;
     int size2 = 0;
 
+    // Checks if the files exists
     if (fp_impressions == NULL || fp_symptoms == NULL) {
         printf("\n\nThe file/s does not exist.\n\n");
         return 0;
     }
 
+    // Get the size of the impressions file
     while (fgetc(fp_impressions) != EOF) {
         size++;
     }
 
+    // Get the size of the symptoms file
     while (fgetc(fp_symptoms) != EOF) {
         size2++;
     }
 
+    // Check if the files are empty
     if (size == 0 || size2 == 0) {
         printf("\nImpressions or Symptoms textfile is empty.\n\n");
         return 0;
@@ -140,7 +144,7 @@ readSymptoms (pairSymptom* masterListSymptom,
     fscanf(fp_symptoms, "%d", &masterListSymptom->overallSymptomsAmt); // read the number of symptoms from the file
 
     for (counter = 0; counter < masterListSymptom->overallSymptomsAmt; counter++) {
-        fscanf(fp_symptoms, "%d", &dumpIndex);
+        fscanf(fp_symptoms, "%d", &dumpIndex); // read the index of the symptom
         fscanf(fp_symptoms, " %[^\n]", masterListSymptom[counter].symptom); // read the symptom
         fscanf(fp_symptoms, " %[^\n]", masterListSymptom[counter].question); // read the question
     }

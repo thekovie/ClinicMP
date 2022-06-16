@@ -75,7 +75,7 @@ printPatientInfo (patientInformation *patient)
         }
     }
 
-    //Checks if there is an impression
+    // Checks if there is an impression
     if (patient->patientImpAmt == 0) {
         fprintf(fp_patient, " There are no impressions to be formed based on the symptoms present or observed.");
         printf(" There are no impressions to be formed based on the symptoms present or observed.");
@@ -181,6 +181,7 @@ getPatientSymptoms (patientInformation *patient,
     int counter;
     int symptomIndex = 0;
 
+    // Show user the list of symptom questions and ask them to input Y or N
     for(counter = 0; counter < masterListSymptom->overallSymptomsAmt; counter++) {
         do {
             printf("%s  ", masterListSymptom[counter].question);
@@ -197,7 +198,7 @@ getPatientSymptoms (patientInformation *patient,
         } while (answer != 'Y' && answer != 'y' && answer != 'N' && answer != 'n');
     }
 
-    patient->patientSympAmt = symptomIndex;
+    patient->patientSympAmt = symptomIndex; // Set the patient's symptom amount
 }
 
 

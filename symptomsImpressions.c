@@ -242,8 +242,8 @@ inputImpression (pairImpression* masterListImpression,
                 sleepDelay(1);
             }
         } while (strlen(masterListImpression[counter1].impression) > MAX_STRING_SIZE);
-    
-        assignSymptoms(masterListImpression, masterListSymptom, counter1);
+
+        assignSymptoms(masterListImpression, masterListSymptom, counter1); // assign the symptoms to the current impression
     }
 
     masterListImpression->impressionsAmount = noImpressions; // set the number of impressions in the master list
@@ -267,7 +267,7 @@ isImpressionPresent (pairImpression* masterListImpression,
 {
     int i;
     for (i = 0; i < masterListImpression->impressionsAmount; i++) {
-        if (strcmp(masterListImpression[i].impression, impression) == 0) {
+        if (strcmp(masterListImpression[i].impression, impression) == 0) { // if the impression is present
             return 1;
         }
     }
@@ -295,10 +295,10 @@ displaySymptoms(String50 impression,
     int counter2;
 
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
-        if (strcmp(impression, masterListImpression[counter].impression) == 0) {
+        if (strcmp(impression, masterListImpression[counter].impression) == 0) { // if the impression is present
             printf("\nThe symptoms for %s are:\n", impression);
-            for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) {
-                printf(" %s\n", masterListSymptom[counter2].symptom);
+            for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) { // for each symptom
+                printf(" %s\n", masterListSymptom[counter2].symptom); // print the symptom
             }
         }
     }
@@ -324,12 +324,14 @@ modifySymptoms (pairImpression* masterListImpression,
     FILE *fp_impressions;
     int counter;
 
+    // Prints all impressions
     printf("\n\nList of Impressions:\n");
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         printf("- %s\n",masterListImpression[counter].impression);
     }
     printf("\n");
 
+    // Ask for the impression that the user wants to modify
     do {
         printf("What is the impression?  ");
         scanf(" %[^\n]", impression);
@@ -341,11 +343,12 @@ modifySymptoms (pairImpression* masterListImpression,
     } while (!isImpressionPresent(masterListImpression, impression));
 
     sleepDelay(1);
-    displaySymptoms(impression, masterListImpression, masterListSymptom);
+    displaySymptoms(impression, masterListImpression, masterListSymptom); // display the symptoms of the given impression
 
     sleepDelay(1);
     printf("\nYou can modify the symptoms of %s.\n", impression);
 
+    // Get the index of the impression
     for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
         if (strcmp(impression, masterListImpression[counter].impression) == 0) {
             impressionIndex = counter;
@@ -355,13 +358,13 @@ modifySymptoms (pairImpression* masterListImpression,
     fp_impressions = fopen("Impressions.txt", "w");
 
     sleepDelay(1);
-    assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); 
-    printImpressions(masterListImpression, fp_impressions);
+    assignSymptoms(masterListImpression, masterListSymptom, impressionIndex); // assign the symptoms to the current impression
+    printImpressions(masterListImpression, fp_impressions); // write the impressions to the file
 
     sleepDelay(1);
     printf("\n\nSymptoms for %s have been modified.\n", impression);
 
-    displaySymptoms(impression, masterListImpression, masterListSymptom);
+    displaySymptoms(impression, masterListImpression, masterListSymptom); // display the new symptoms of the given impression
 
     sleepDelay(1);
     fclose(fp_impressions);

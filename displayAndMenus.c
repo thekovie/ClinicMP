@@ -141,7 +141,7 @@ doctorChoice (char choice,
             break;
         case 'D':
         case 'd':
-            if (ifExtracted(isFilesExtracted)) {
+            if (ifExtracted(isFilesExtracted)) { // If the files have been extracted then Display symptoms
                 printf("\n\nList of Impressions:\n");
                 for (counter = 0; counter < masterListImpression->impressionsAmount; counter++) {
                     printf("- %s\n",masterListImpression[counter].impression);
@@ -171,8 +171,8 @@ doctorChoice (char choice,
 
         case 'M':
         case 'm':
-            if (ifExtracted(isFilesExtracted)) {
-                modifySymptoms(masterListImpression, masterListSymptom);
+            if (ifExtracted(isFilesExtracted)) { // If the files have been extracted
+                modifySymptoms(masterListImpression, masterListSymptom); // Modify the symptoms
             }
             else {
                 printf("\n[ERROR!] You cannot enter this option yet. Load the database first.\n\n");
@@ -181,7 +181,7 @@ doctorChoice (char choice,
             break;
         case 'U':
         case 'u':
-            extractList(masterListImpression, masterListSymptom, isFilesExtracted);
+            extractList(masterListImpression, masterListSymptom, isFilesExtracted); // Extract the files
             break;
 
        
