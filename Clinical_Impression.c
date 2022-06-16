@@ -37,6 +37,7 @@ typedef char String50[MAX_STRING_SIZE]; // String of 50 characters
 
     @property {int} symptomBool     1 if 'Symptoms.txt' has been extracted, 0 if it doesn't.
     @property {int} impressionBool  1 if 'Impressions.txt' has been extracted, 0 if it doesn't.
+    Pre-condition: symptomBool and impressionBool must be initialized to 0.
  */
 typedef struct filesExtracted 
 {
@@ -52,6 +53,7 @@ typedef struct filesExtracted
     @property {String50} question   The question that the user will be asked.
     @property {String50} symptom    The symptom that the user is experiencing.
     @property {int} overallSymptomsAmt  The amount of symptoms that the user has.
+    Pre-condition: question and symptom must be initialized to empty strings.
  */
 typedef struct pairSymptom
 {
@@ -69,6 +71,7 @@ typedef struct pairSymptom
     @property {int} symptomsAmountPerImpression     The amount of symptoms per impression.
     @property {int} symptomsIndexPerImpression      The index of the symptoms per impression.
     @property {int} impressionsAmount   The amount of impressions in the array.
+    Pre-condition: impression must be initialized to an empty string.
  */
 typedef struct pairImpression
 {
@@ -92,6 +95,7 @@ typedef struct pairImpression
     @property {pairSymptom} patientSymptoms     This is an array of structs that contain a symptom and a
                                                 value.
     @property {pairImpression} patientImpressions   This is an array of pairImpression.
+    Pre-condition: name, patientno, age
  */
 typedef struct patientInformation
 {
@@ -111,6 +115,7 @@ typedef struct patientInformation
     for `n` seconds
 
     @param n    The number of seconds to sleep.
+    Pre-condition: n must be a positive integer.
  */
 void 
 sleepDelay (int n) 
@@ -125,6 +130,7 @@ sleepDelay (int n)
 
 /**
     It waits for the user to press a key.
+    Pre-condition: None.
  */
 void 
 displayKey () 
@@ -143,6 +149,7 @@ displayKey ()
     P, or E, the user is asked to try again.
   
     @return The user's choice.
+    Pre-condition: None.
  */
 char 
 userType() 
@@ -173,6 +180,7 @@ userType()
     It's a function that displays a menu for the doctor to use, and returns the doctor's choice.
 
     @return The choice of the user.
+    Pre-condition: None.
  */
 char 
 doctorMenu() 
