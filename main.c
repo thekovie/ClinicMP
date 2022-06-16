@@ -7,8 +7,8 @@
     
     Last modified:     Jun 16, 2022
     Version:           1.0
-    Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
-                        and https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
+    Acknowledgements:  - I thank https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue,
+                        https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash, and https://www.tutorialspoint.com/c_standard_library/c_function_atoi.htm
                         for the help in implementing the pause code in some operating systems and other libraries for making
                         this project p`ossible.        
  */
