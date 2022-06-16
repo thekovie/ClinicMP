@@ -1,14 +1,12 @@
 #include "clinic.h"
 
 
-
-
-
-
 /**
     It prints the patient's information to a file.
    
     @param patient  a pointer to a patientInformation struct.
+
+    Pre-condition: patientInformation is not empty.
  */
 void 
 printPatientInfo (patientInformation *patient) 
@@ -130,6 +128,8 @@ printPatientInfo (patientInformation *patient)
     @param masterListSymptom    a struct that contains the symptom and its index.
     @param masterListImpression     a struct that contains the impression and the symptoms that are
                                     associated with it.
+
+    Pre-condition: masterListSymptom and masterListImpression must not be empty.
  */
 void 
 getPatientImpression (patientInformation *patient, 
@@ -170,6 +170,8 @@ getPatientImpression (patientInformation *patient,
    
     @param patient  a struct that holds the patient's information.
     @param masterListSymptom    This is a pointer to a struct that contains a list of symptoms.
+
+    Pre-condition: masterListSymptom must not be empty.
  */
 void 
 getPatientSymptoms (patientInformation *patient,
@@ -204,6 +206,8 @@ getPatientSymptoms (patientInformation *patient,
     patientImpressions arrays, and sets each element to an empty string.
     
     @param patient  a pointer to a patientInformation struct.
+
+    Pre-condition: None.
  */
 void 
 emptyHistory (patientInformation *patient) 
@@ -230,6 +234,8 @@ emptyHistory (patientInformation *patient)
     @param patient  a struct that contains the patient's information.
     @param masterListSymptom    a linked list of symptoms.
     @param masterListImpression     a linked list of impressions.
+
+    Pre-condition: masterListSymptom and masterListImpression must not be empty.
  */
 void 
 getPatientInfo (patientInformation *patient, 

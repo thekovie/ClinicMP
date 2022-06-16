@@ -6,6 +6,8 @@
 
     @param masterListImpression     an array of structs that holds the impressions.
     @param fp_impressions   the file pointer to the file that contains the impressions.
+
+    Pre-condition: The file must exist and is not be empty.
  */
  
 void 
@@ -80,6 +82,8 @@ readImpressions(pairImpression* masterListImpression,
     It checks if the files exist and if they are empty.
  
     @return the value 1 or 0 depending on whether the files exist and are empty.
+
+    Pre-condition: The file name must exactly match the file name in the directory to avoid case-sensitivity issues.
  */
 int 
 filesExists() 
@@ -123,6 +127,8 @@ filesExists()
  
     @param masterListSymptom    a pointer to a struct that contains the symptom and the question.
     @param fp_symptoms  the file pointer to the file that contains the symptoms.
+
+    Pre-condition: The file must exist and is not be empty.
  */
 void 
 readSymptoms (pairSymptom* masterListSymptom, 
@@ -148,6 +154,8 @@ readSymptoms (pairSymptom* masterListSymptom,
     @param isFilesExtracted     a struct that contains two bools, one for each file.
    
     @return a 1 or 0.
+
+    Pre-condition: isFilesExtracted must only contain an integer.
  */
 int 
 ifExtracted (filesExtracted* isFilesExtracted) 
@@ -165,6 +173,8 @@ ifExtracted (filesExtracted* isFilesExtracted)
     @param masterListImpression     a struct that contains the impressions.
     @param masterListSymptom    a linked list of symptoms.
     @param isFilesExtracted     a struct that contains two bools, one for symptoms and one for impressions.
+
+    Pre-condition: The file names must exactly match the file name in the directory to avoid case-sensitivity issues.
  */
 void 
 extractList (pairImpression* masterListImpression, 

@@ -1,5 +1,6 @@
 #include "clinic.h"
 
+
 #if defined(_WIN32) // If the system is Windows
     #include <conio.h> // For the pause function
     #include <windows.h> // For the sleep function
@@ -115,6 +116,8 @@ doctorMenu()
     @param masterListImpression     a struct that contains the impression and the amount of impressions.
     @param isFilesExtracted     a struct that contains the boolean values of whether the files have been
                                 extracted or not.
+
+    Pre-condition: User is a doctor.
  */
 void 
 doctorChoice (char choice, 

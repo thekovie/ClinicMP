@@ -1,5 +1,6 @@
 #include "clinic.h"
 
+
 #if defined(_WIN32) // If the system is Windows
     #include <conio.h> // For the pause function
     #include <windows.h> // For the sleep function
@@ -13,6 +14,8 @@
     @param masterList   is the list of symptoms and impressions.
     @param fp_symptoms  is  the file that will contain the symptoms.
     @param N    is the number of symptoms.
+
+    Pre-condition: masterListSymptom is not empty.
 */
 void 
 writeSymptoms(pairSymptom* masterListSymptom, 
@@ -38,6 +41,8 @@ writeSymptoms(pairSymptom* masterListSymptom,
     symptom and its corresponding question.
 
     @param masterListSymptom    a pointer to a struct that contains the symptom and the question.
+
+    Pre-condition: masterListSymptom is empty.
  */
 void 
 inputSymptoms(pairSymptom* masterListSymptom) 
@@ -104,6 +109,8 @@ inputSymptoms(pairSymptom* masterListSymptom)
     @param masterListImpression   is the list of impressions and symptoms.
     @param masterListSymptom    is the list of symptoms and questions.
     @param fp_impression    is the file that will contain the impressions and their corresponding symptoms.
+
+    Pre-condition: masterListImpression is not empty.
 */
 void 
 printImpressions (pairImpression* masterListImpression, 
@@ -139,6 +146,8 @@ printImpressions (pairImpression* masterListImpression,
                                     that are associated with it.
     @param masterListSymptom     is a pointer to a struct that contains the list of symptoms
     @param impressionIndex   the index of the current impression
+
+    Pre-condition: impressionIndex is an integer and masterListSymptom is not empty.
  */
 void 
 assignSymptoms (pairImpression* masterListImpression, 
@@ -196,6 +205,8 @@ assignSymptoms (pairImpression* masterListImpression,
 
     @param masterListImpression     The list of impressions
     @param masterListSymptom        The list of symptoms and questions
+
+    Pre-condition: masterListImpression is empty.
 */
 void 
 inputImpression (pairImpression* masterListImpression, 
@@ -247,6 +258,8 @@ inputImpression (pairImpression* masterListImpression,
     @param impression   the impression to be checked.
 
     @return an integer.
+
+    Pre-condition: masterListImpression is not empty.
  */
 int 
 isImpressionPresent (pairImpression* masterListImpression, 
@@ -270,6 +283,8 @@ isImpressionPresent (pairImpression* masterListImpression,
     @param masterListImpression     This is a pointer to a struct that contains the impression and the 
                                     symptoms associated with it.
     @param masterListSymptom    a pointer to a struct that contains a list of symptoms.
+
+    Pre-condition: masterListImpression and masterListSymptom is not empty.
  */
 void 
 displaySymptoms(String50 impression, 
@@ -296,7 +311,9 @@ displaySymptoms(String50 impression,
     user to modify the symptoms of that impression.
    
     @param masterListImpression     a struct that contains the impression and the amount of symptoms it has.
-    @param masterListSymptom    a struct that contains the symptoms
+    @param masterListSymptom    a struct that contains the symptoms.
+
+    Pre-condition: masterListImpression is not empty.
  */
 void 
 modifySymptoms (pairImpression* masterListImpression, 
