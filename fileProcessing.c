@@ -19,15 +19,15 @@ readImpressions(pairImpression* masterListImpression,
     int i;
     int j;
     int k;
-    char line[60];
+    char line[60]; // 20 2-digits impressions + 19 spaces + 1 null char
     
-    fgets(line, MAX_STRING_SIZE, fp_impressions);
+    fgets(line, MAX_STRING_SIZE, fp_impressions); 
     sscanf(line, "%d", &impressionCount); // get the number of impressions
 
     masterListImpression->impressionsAmount = impressionCount;
 
     for (i = 1; i <= impressionCount * 3; i++) {
-        fgets(line, MAX_STRING_SIZE, fp_impressions);
+        fgets(line, MAX_STRING_SIZE, fp_impressions); // get the line
         line[strlen(line) - 1] = '\0'; // remove the newline character
 
         switch (i % 3) {
@@ -38,8 +38,8 @@ readImpressions(pairImpression* masterListImpression,
             case 0: { //symptoms
                 String50 symptomNum = "";
                 int sympNum = 0; // temporary variable to hold the symptom number
-                int sympIndex = 0; //  index of symptomNum
-                int impIndex = 0; // the index of the impression in the master list
+                int sympIndex = 0; //  index of symptomNum to store the symptomNum
+                int impIndex = 0; // the no. of symptoms per impression
 
                 for (j = 0; j < strlen(line); j++) {
 
