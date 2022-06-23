@@ -298,7 +298,7 @@ displaySymptoms(String50 impression,
         if (strcmp(impression, masterListImpression[counter].impression) == 0) { // if the impression is present
             printf("\nThe symptoms for %s are:\n", impression);
             for (counter2 = 0; counter2 < masterListImpression[counter].symptomsAmountPerImpression; counter2++) { // for each symptom
-                printf(" %s\n", masterListSymptom[counter2].symptom); // print the symptom
+                printf(" %s\n", masterListSymptom[masterListImpression[counter].symptomsIndexPerImpression[counter2]].symptom); // print the symptom
             }
         }
     }

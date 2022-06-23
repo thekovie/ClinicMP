@@ -260,7 +260,7 @@ getPatientInfo (patientInformation *patient,
         }
     } while (!(patient->gender == 'M' || patient->gender == 'm' || patient->gender == 'F' || patient->gender == 'f'));
     
-    emptyHistory(patient);
+    
 
     // ask questions to patient
     getPatientSymptoms(patient, masterListSymptom);
@@ -270,6 +270,8 @@ getPatientInfo (patientInformation *patient,
 
     // write text file
     printPatientInfo(patient);
+
+    emptyHistory(patient);
 
 }
 
