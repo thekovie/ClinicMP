@@ -18,7 +18,7 @@ This is a console-based c-program that can generate a list of clinical impressio
 gcc -Wall main.c -o main
 ```
 
-# Play the Game!
+# Run the program!
 1. Follow Installation guidelines
 2. Run command in terminal `./main` to start the game or open the `main.exe` file if Windows.
 
@@ -28,11 +28,11 @@ We have some test runs in the Test Cases folder.
 To give it a run, follow installation guidelines, then open Terminal (UNIX) or Command Prompt (Windows) and do one of the following commands:
 
 ```bash
-main < "Test Cases/INPUT.txt"
+main < "test/INPUT.txt"
 ```
 or
 ```bash
-main < "Test Cases/INPUTDATA.txt"
+main < "test/INPUTDATA.txt"
 ```
 
 
