@@ -11,7 +11,7 @@ This is a console-based c-program that can generate a list of clinical impressio
 # Installation
 1. Clone the repository or Download zip file and extract the folder.
 
-2. Go to file directory
+2. Go to file directory > `src` folder
 
 3. Open terminal and run the command:
 ```bash
@@ -28,11 +28,11 @@ We have some test runs in the Test Cases folder.
 To give it a run, follow installation guidelines, then open Terminal (UNIX) or Command Prompt (Windows) and do one of the following commands:
 
 ```bash
-main < "test/INPUT.txt"
+src/main < "test/INPUT.txt"
 ```
 or
 ```bash
-main < "test/INPUTDATA.txt"
+src/main < "test/INPUTDATA.txt"
 ```
 
 
